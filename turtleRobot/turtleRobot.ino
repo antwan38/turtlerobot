@@ -1,7 +1,7 @@
-#define IN1 = 4;
-#define IN2 = 5;
-#define IN3 = 6;
-#define IN4 = 7;
+#define IN1 4
+#define IN2 5
+#define IN3 6
+#define IN4 7
  
 void setup()
 {
@@ -28,5 +28,5 @@ delay(2000);
 // Motor B
 digitalWrite(IN3, HIGH);
 digitalWrite(IN4, HIGH);
-delay(500)
+delay(500);
 }
