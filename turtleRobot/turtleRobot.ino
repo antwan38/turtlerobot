@@ -18,22 +18,22 @@ double DistancePerPulse = 0.000418879;
 float x;
 float z;
 
-double PkLeft = 3;
-double IkLeft = 2;
+double PkLeft = 30;
+double IkLeft = 10;
 double DkLeft = 0.01;
 
 double SetpointLeft, InputLeft, OutputLeft;
 PID PIDLeft(&InputLeft, &OutputLeft, &SetpointLeft, PkLeft, IkLeft, DkLeft, DIRECT);
 
-double PkRight = 3;
-double IkRight = 2;
+double PkRight = 30;
+double IkRight = 10;
 double DkRight = 0.01;
 
 double SetpointRight, InputRight, OutputRight;
 PID PIDRight(&InputRight, &OutputRight, &SetpointRight, PkRight, IkRight, DkRight, DIRECT);
 
-float demandLeft = -20000;
-float demandRight = -20000;
+float demandLeft = 2;
+float demandRight = 2;
 
 ros::NodeHandle nh;
 
@@ -51,8 +51,8 @@ volatile int encoderRightPosPrev = 0;
 volatile int pulseCountLeft;
 volatile int pulseCountRight;
 
-double velocity;
-double distance;
+double velocityLeft;
+double velocityRight;
 
 unsigned long current =0;
 unsigned long prev =0;
@@ -104,53 +104,54 @@ void loop()
         demandLeft = 0;
       }
     }
-    Serial.print("demand: ");
-    Serial.println(demandLeft);
-    Serial.print("posLEFT: ");
-    Serial.println(encoderLeftPos);
-    Serial.print("posRIGHT: ");
-    Serial.println(encoderRightPos);
-    Serial.println("-------------------");
-
-    calculate();
+    // Serial.print("demand: ");
+    // Serial.println(demandLeft);
+    // Serial.print("posLEFT: ");
+    // Serial.println(encoderLeftPos);
+    // Serial.print("posRIGHT: ");
+    // Serial.println(encoderRightPos);
+    // Serial.println("-------------------");
+    calculateVel();
+    calculatePID();
     drive();
     
-
-    // 0.251 m 
-//     demandx = 300 / PI * 0.04
-// 10ml
-// 300 
-    // second = second + 10;
-    // if(second >= 1000){
-    //   pulseCount = encoderLeftPos - encoderLeftPosPrev;
-    //   distance = pulseCount * DistancePerPulse;
-    //   encoderLeftPosPrev = encoderLeftPos;
-    //   Serial.print("distance: ");
-    //   Serial.println(distance);
-    //   Serial.print("pulseCount: ");
-    //   Serial.println(pulseCount);
-    //   Serial.print("velWheel: ");
-    //   Serial.println(velocity);
-    //   Serial.println("-------------------");
-    //   second = 0;
-    // }
+  }
+  if (current >= 30000){
+    demandLeft = 0;
+    demandRight = 0;
   }
 
   nh.spinOnce();
   
 }
 
-// void getWheelVelocities(v, omega, R, L){
-//   V_L = (2*v - L*omega) / (2*R);
-//   V_R = (2*v + L*omega) / (2*R);
-// }
-void calculate(){
+void calculateVel(){
+  second = second + 10;
+    if(second >= 1000){
+      pulseCountLeft = encoderLeftPos - encoderLeftPosPrev;
+      velocityLeft = pulseCountLeft * DistancePerPulse;
+      encoderLeftPosPrev = encoderLeftPos;
+
+      pulseCountRight = encoderRightPos - encoderRightPosPrev;
+      velocityRight = pulseCountRight * DistancePerPulse;
+      encoderRightPosPrev = encoderRightPos;
+
+      Serial.print("velWheelLEFT: ");
+      Serial.println(velocityLeft);
+      Serial.print("velWheelRight: ");
+      Serial.println(velocityRight);
+      Serial.println("-------------------");
+      second = 0;
+    }
+}
+
+void calculatePID(){
     SetpointLeft = demandLeft;
-    InputLeft = encoderLeftPos;
+    InputLeft = velocityLeft;
     PIDLeft.Compute();
 
     SetpointRight = demandRight;
-    InputRight = encoderRightPos;
+    InputRight = velocityRight;
     PIDRight.Compute();
 }
 
