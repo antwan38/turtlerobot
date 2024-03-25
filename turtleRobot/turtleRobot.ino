@@ -32,8 +32,8 @@ double DkRight = 0.01;
 double SetpointRight, InputRight, OutputRight;
 PID PIDRight(&InputRight, &OutputRight, &SetpointRight, PkRight, IkRight, DkRight, DIRECT);
 
-float demandLeft = 2;
-float demandRight = 2;
+float demandLeft = 2.5;
+float demandRight = 2.5;
 
 ros::NodeHandle nh;
 
@@ -156,8 +156,13 @@ void calculatePID(){
 }
 
 void drive(){
-  if (OutputLeft > 0){
-
+  if(demandLeft == 0 && velocityLeft == 0){
+      digitalWrite(LeftM1, LOW);
+      digitalWrite(LeftM2, LOW);
+      analogWrite(LeftPwm, 0);
+  }
+  else{
+    if (OutputLeft > 0){
       digitalWrite(LeftM1, HIGH);
       digitalWrite(LeftM2, LOW);
       analogWrite(LeftPwm, abs(OutputLeft));
@@ -172,9 +177,14 @@ void drive(){
       analogWrite(LeftPwm, 0);
       
     }
-
-    if (OutputRight > 0){
-
+  }
+    if(demandRight == 0 && velocityRight == 0){
+      digitalWrite(RightM1, LOW);
+      digitalWrite(RightM2, LOW);
+      analogWrite(RightPwm, 0);
+    }
+    else{
+      if (OutputRight > 0){
       digitalWrite(RightM1, HIGH);
       digitalWrite(RightM2, LOW);
       analogWrite(RightPwm, abs(OutputRight));
@@ -186,9 +196,9 @@ void drive(){
     else{
       digitalWrite(RightM1, LOW);
       digitalWrite(RightM2, LOW);
-      analogWrite(RightPwm, 0);
-      
+      analogWrite(RightPwm, 0);      
     }
+  } 
 }
 
 void doEncoderLeftA(){
