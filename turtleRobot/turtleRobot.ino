@@ -11,20 +11,29 @@
 #define RightPwm 10
 #define EncoderLeftA 2
 #define EncoderLeftB 3
-#define EncoderRightA 12
-#define EncoderRightB 11
+#define EncoderRightA 20
+#define EncoderRightB 21
+double DistancePerPulse = 0.000418879;
 
 float x;
 float z;
 
-double Pk = 1;
-double Ik = 0;
-double Dk = 0.01;
+double PkLeft = 3;
+double IkLeft = 2;
+double DkLeft = 0.01;
 
-double Setpoint, Input, Output;
-PID PIDLeft(&Input, &Output, &Setpoint, Pk, Ik, Dk, DIRECT);
+double SetpointLeft, InputLeft, OutputLeft;
+PID PIDLeft(&InputLeft, &OutputLeft, &SetpointLeft, PkLeft, IkLeft, DkLeft, DIRECT);
 
-float demand = 14500;
+double PkRight = 3;
+double IkRight = 2;
+double DkRight = 0.01;
+
+double SetpointRight, InputRight, OutputRight;
+PID PIDRight(&InputRight, &OutputRight, &SetpointRight, PkRight, IkRight, DkRight, DIRECT);
+
+float demandLeft = -20000;
+float demandRight = -20000;
 
 ros::NodeHandle nh;
 
@@ -36,10 +45,18 @@ void velCallback( const geometry_msgs::Twist& vel){
 ros::Subscriber<geometry_msgs::Twist> sub("cmd_vel", velCallback);
 
 volatile int encoderLeftPos = 0;
-volatile int encoderRightPos = 0; 
+volatile int encoderLeftPosPrev = 0;
+volatile int encoderRightPos = 0;
+volatile int encoderRightPosPrev = 0;
+volatile int pulseCountLeft;
+volatile int pulseCountRight;
+
+double velocity;
+double distance;
 
 unsigned long current =0;
 unsigned long prev =0;
+int second = 0;
   
 void setup()
 {
@@ -56,10 +73,16 @@ void setup()
 
   attachInterrupt(digitalPinToInterrupt(EncoderLeftA), doEncoderLeftA, CHANGE);
   attachInterrupt(digitalPinToInterrupt(EncoderLeftB), doEncoderLeftB, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(EncoderRightA), doEncoderRightA, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(EncoderRightB), doEncoderRightB, CHANGE);
 
   PIDLeft.SetMode(AUTOMATIC);
-  PIDLeft.SetOutputLimits(-100, 100);
+  PIDLeft.SetOutputLimits(-240, 240);
   PIDLeft.SetSampleTime(10);
+
+  PIDRight.SetMode(AUTOMATIC);
+  PIDRight.SetOutputLimits(-240, 240);
+  PIDRight.SetSampleTime(10);
   
   nh.initNode();
   nh.subscribe(sub);
@@ -76,29 +99,71 @@ void loop()
       char c = Serial.read();
 
       if (c == 's'){
-        demand = 14500;
+        demandLeft = 14500;
       }else if (c == 'p'){
-        demand = 0;
+        demandLeft = 0;
       }
     }
     Serial.print("demand: ");
-    Serial.println(demand);
-    Serial.print("pos: ");
+    Serial.println(demandLeft);
+    Serial.print("posLEFT: ");
     Serial.println(encoderLeftPos);
+    Serial.print("posRIGHT: ");
+    Serial.println(encoderRightPos);
     Serial.println("-------------------");
-    Setpoint = demand;
-    Input = encoderLeftPos;
+
+    calculate();
+    drive();
+    
+
+    // 0.251 m 
+//     demandx = 300 / PI * 0.04
+// 10ml
+// 300 
+    // second = second + 10;
+    // if(second >= 1000){
+    //   pulseCount = encoderLeftPos - encoderLeftPosPrev;
+    //   distance = pulseCount * DistancePerPulse;
+    //   encoderLeftPosPrev = encoderLeftPos;
+    //   Serial.print("distance: ");
+    //   Serial.println(distance);
+    //   Serial.print("pulseCount: ");
+    //   Serial.println(pulseCount);
+    //   Serial.print("velWheel: ");
+    //   Serial.println(velocity);
+    //   Serial.println("-------------------");
+    //   second = 0;
+    // }
+  }
+
+  nh.spinOnce();
+  
+}
+
+// void getWheelVelocities(v, omega, R, L){
+//   V_L = (2*v - L*omega) / (2*R);
+//   V_R = (2*v + L*omega) / (2*R);
+// }
+void calculate(){
+    SetpointLeft = demandLeft;
+    InputLeft = encoderLeftPos;
     PIDLeft.Compute();
 
-    if (Output > 0){
+    SetpointRight = demandRight;
+    InputRight = encoderRightPos;
+    PIDRight.Compute();
+}
+
+void drive(){
+  if (OutputLeft > 0){
 
       digitalWrite(LeftM1, HIGH);
       digitalWrite(LeftM2, LOW);
-      analogWrite(LeftPwm, abs(Output));
-    }else if (Output < 0){
+      analogWrite(LeftPwm, abs(OutputLeft));
+    }else if (OutputLeft < 0){
       digitalWrite(LeftM1, LOW);
       digitalWrite(LeftM2, HIGH);
-      analogWrite(LeftPwm, abs(Output));
+      analogWrite(LeftPwm, abs(OutputLeft));
     }
     else{
       digitalWrite(LeftM1, LOW);
@@ -107,15 +172,22 @@ void loop()
       
     }
 
-  }
-  
-  
-  //Serial1.print(x);
-  //Serial1.print(" , ");
-  //Serial1.print(z);
+    if (OutputRight > 0){
 
-  nh.spinOnce();
-  
+      digitalWrite(RightM1, HIGH);
+      digitalWrite(RightM2, LOW);
+      analogWrite(RightPwm, abs(OutputRight));
+    }else if (OutputRight < 0){
+      digitalWrite(RightM1, LOW);
+      digitalWrite(RightM2, HIGH);
+      analogWrite(RightPwm, abs(OutputRight));
+    }
+    else{
+      digitalWrite(RightM1, LOW);
+      digitalWrite(RightM2, LOW);
+      analogWrite(RightPwm, 0);
+      
+    }
 }
 
 void doEncoderLeftA(){
@@ -152,6 +224,44 @@ void doEncoderLeftB(){
       }
       else{
         encoderLeftPos = encoderLeftPos - 1;
+      }
+    }
+}
+
+void doEncoderRightA(){
+  if (digitalRead(EncoderRightA) == HIGH) {
+    if(digitalRead(EncoderRightB) == LOW){
+        encoderRightPos = encoderRightPos + 1;
+      }
+      else{
+        encoderRightPos = encoderRightPos - 1;
+      }
+    }
+    else{
+      if(digitalRead(EncoderRightB) == HIGH){
+        encoderRightPos = encoderRightPos + 1;
+      }
+      else{
+        encoderRightPos = encoderRightPos - 1;
+      }
+    }
+}
+
+void doEncoderRightB(){
+  if (digitalRead(EncoderRightB) == HIGH) {
+    if(digitalRead(EncoderRightA) == HIGH){
+        encoderRightPos = encoderRightPos + 1;
+      }
+      else{
+        encoderRightPos = encoderRightPos - 1;
+      }
+    }
+    else{
+      if(digitalRead(EncoderRightA) == LOW){
+        encoderRightPos = encoderRightPos + 1;
+      }
+      else{
+        encoderRightPos = encoderRightPos - 1;
       }
     }
 }
