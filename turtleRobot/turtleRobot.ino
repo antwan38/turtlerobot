@@ -44,6 +44,7 @@ void velCallback( const geometry_msgs::Twist& vel){
 }
 
 ros::Subscriber<geometry_msgs::Twist> sub("cmd_vel", velCallback);
+ros::Publisher<geometry_msgs::Twist> pub("cmd_vel", velCallfoward);
 
 volatile int encoderLeftPos = 0;
 volatile int encoderLeftPosPrev = 0;
