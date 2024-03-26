@@ -2,7 +2,7 @@
 #include "geometry_msgs/Twist.h"
 #include <PID_v1.h>
 
-
+// 0.04 radius van band
 #define LeftM1 5
 #define LeftM2 6
 #define RightM1 7
@@ -54,9 +54,8 @@ volatile int pulseCountRight;
 double velocityLeft;
 double velocityRight;
 
-unsigned long current =0;
-unsigned long prev =0;
-int second = 0;
+unsigned long current = 0;
+unsigned long prev = 0;
   
 void setup()
 {
@@ -94,16 +93,6 @@ void loop()
   
   current = millis();
   if (current - prev >= 10){
-    prev = current;
-    if (Serial.available()>0){
-      char c = Serial.read();
-
-      if (c == 's'){
-        demandLeft = 14500;
-      }else if (c == 'p'){
-        demandLeft = 0;
-      }
-    }
     // Serial.print("demand: ");
     // Serial.println(demandLeft);
     // Serial.print("posLEFT: ");
@@ -126,23 +115,21 @@ void loop()
 }
 
 void calculateVel(){
-  second = second + 10;
-    if(second >= 1000){
-      pulseCountLeft = encoderLeftPos - encoderLeftPosPrev;
-      velocityLeft = pulseCountLeft * DistancePerPulse;
-      encoderLeftPosPrev = encoderLeftPos;
+    pulseCountLeft = encoderLeftPos - encoderLeftPosPrev;
+    velocityLeft = pulseCountLeft * DistancePerPulse;
+    encoderLeftPosPrev = encoderLeftPos;
+    velocityLeft = velocityLeft * 100;
 
-      pulseCountRight = encoderRightPos - encoderRightPosPrev;
-      velocityRight = pulseCountRight * DistancePerPulse;
-      encoderRightPosPrev = encoderRightPos;
+    pulseCountRight = encoderRightPos - encoderRightPosPrev;
+    velocityRight = pulseCountRight * DistancePerPulse;
+    velocityRight = velocityRight * 100;
+    encoderRightPosPrev = encoderRightPos;
 
-      Serial.print("velWheelLEFT: ");
-      Serial.println(velocityLeft);
-      Serial.print("velWheelRight: ");
-      Serial.println(velocityRight);
-      Serial.println("-------------------");
-      second = 0;
-    }
+    Serial.print("velWheelLEFT: ");
+    Serial.println(velocityLeft);
+    Serial.print("velWheelRight: ");
+    Serial.println(velocityRight);
+    Serial.println("-------------------");
 }
 
 void calculatePID(){
