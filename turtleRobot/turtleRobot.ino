@@ -16,6 +16,7 @@
 #define r 0.04
 #define L 0.25
 double DistancePerPulse = 0.000418879;
+double LengthBetweenWheels = 0.25;
 
 float x;
 float z;
@@ -37,8 +38,8 @@ double DkRight = 0.01;
 double SetpointRight, InputRight, OutputRight;
 PID PIDRight(&InputRight, &OutputRight, &SetpointRight, PkRight, IkRight, DkRight, DIRECT);
 
-float demandLeft = -1;
-float demandRight = -1;
+float demandLeft = 2;
+float demandRight = 2;
 
 ros::NodeHandle nh;
 
@@ -67,6 +68,8 @@ double omegaR;
 double omegaL;
 double omega;
 double orientation= 0;
+double robotVel;
+double robotAngVel;
 
 unsigned long current = 0;
 unsigned long prev = 0;
@@ -114,15 +117,23 @@ void loop()
     // Serial.print("posRIGHT: ");
     // Serial.println(encoderRightPos);
     // Serial.println("-------------------");
-    // if(i < 100){
-    calculateVel();
-    // i++;
-    // }
+    calculateWheelVel();
     calculatePID();
+    calculateRobotVel();
+    calculateRobotAngVel();
     drive();
 
+    Serial.print(velocityLeft);
+    Serial.print(" :: ");
+    Serial.println(velocityRight);
+    Serial.print("robotAngVel: ");
+    Serial.println(robotAngVel);
+    Serial.print("robotvel: ");
+    Serial.println(robotVel);
+    Serial.println("-------------------");
+    
   }
-  if (current >= 30000){
+  if (current >= 20000){
     demandLeft = 0;
     demandRight = 0;
   }
@@ -130,7 +141,7 @@ void loop()
   nh.spinOnce();
 }
 
-void calculateVel(){
+void calculateWheelVel(){
     pulseCountLeft = encoderLeftPos - encoderLeftPosPrev;
     velocityLeft = pulseCountLeft * DistancePerPulse;
     velocityLeft = velocityLeft * 100;
@@ -203,6 +214,15 @@ void calculatePID(){
     PIDRight.Compute();
 }
 
+void calculateRobotVel(){
+  robotVel = (velocityRight + velocityLeft) /2;
+}
+
+void calculateRobotAngVel(){
+  robotAngVel = (velocityRight - velocityLeft) / LengthBetweenWheels;
+}
+
+
 void drive(){
   if(demandLeft == 0 && velocityLeft == 0){
       digitalWrite(LeftM1, LOW);
@@ -211,12 +231,12 @@ void drive(){
   }
   else{
     if (OutputLeft > 0){
-      digitalWrite(LeftM1, HIGH);
-      digitalWrite(LeftM2, LOW);
-      analogWrite(LeftPwm, abs(OutputLeft));
-    }else if (OutputLeft < 0){
       digitalWrite(LeftM1, LOW);
       digitalWrite(LeftM2, HIGH);
+      analogWrite(LeftPwm, abs(OutputLeft));
+    }else if (OutputLeft < 0){
+      digitalWrite(LeftM1, HIGH);
+      digitalWrite(LeftM2, LOW);
       analogWrite(LeftPwm, abs(OutputLeft));
     }
     else{
