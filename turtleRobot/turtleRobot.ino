@@ -13,14 +13,19 @@
 #define EncoderLeftB 3
 #define EncoderRightA 20
 #define EncoderRightB 21
+#define r 0.04
+#define L 0.25
 double DistancePerPulse = 0.000418879;
 double LengthBetweenWheels = 0.25;
 
 float x;
 float z;
 
-double PkLeft = 30;
-double IkLeft = 10;
+double Xpos = 0;
+double Ypos = 0;
+
+double PkLeft = 3;
+double IkLeft = 2;
 double DkLeft = 0.01;
 
 double SetpointLeft, InputLeft, OutputLeft;
@@ -55,14 +60,24 @@ volatile int pulseCountRight;
 
 double velocityLeft;
 double velocityRight;
+double velocity;
+// double distanceL;
+// double distanceR;
+// double distance;
+double R;
+double omegaR;
+double omegaL;
+double omega;
+double orientation= 0;
 double robotVel;
 double robotAngVel;
 
 unsigned long current = 0;
 unsigned long prev = 0;
-  
+int i = 0;  
 void setup()
 {
+  Serial.println("start");
   pinMode(LeftM1, OUTPUT);
   pinMode(LeftM2, OUTPUT);
   pinMode(RightM1, OUTPUT);
@@ -86,7 +101,6 @@ void setup()
   PIDRight.SetMode(AUTOMATIC);
   PIDRight.SetOutputLimits(-240, 240);
   PIDRight.SetSampleTime(10);
-  
   nh.initNode();
   nh.subscribe(sub);
   Serial.begin(115200);
@@ -126,19 +140,69 @@ void loop()
   }
 
   nh.spinOnce();
-  
 }
 
 void calculateWheelVel(){
     pulseCountLeft = encoderLeftPos - encoderLeftPosPrev;
     velocityLeft = pulseCountLeft * DistancePerPulse;
-    encoderLeftPosPrev = encoderLeftPos;
     velocityLeft = velocityLeft * 100;
-
+    // calculate velocity left
     pulseCountRight = encoderRightPos - encoderRightPosPrev;
     velocityRight = pulseCountRight * DistancePerPulse;
     velocityRight = velocityRight * 100;
-    encoderRightPosPrev = encoderRightPos;
+      // calculate velocity right
+      encoderLeftPosPrev = encoderLeftPos;
+      encoderRightPosPrev = encoderRightPos;
+      //set new position
+      velocity = (velocityLeft+ velocityRight)/2;
+      // calculate velocity
+      omegaR = velocityRight/r;
+      omegaL = velocityLeft/r;
+      // calculating angular velocity right and left
+      omega = (velocityRight - velocityLeft)/L;
+      // calculating angular velocity
+      R = velocity/omega; 
+      // calculating radius circle platform
+      Serial.println("calc pos: ");
+      Serial.println(omega);
+      Serial.println(Xpos + velocity/ omega*(sin(omega * 0.01 + orientation) - sin(orientation)));
+      Serial.println(Ypos - velocity/ omega*(cos(omega * 0.01 + orientation) - cos(orientation)));
+      double Xw = Xpos + velocity/ omega*(sin(omega * 0.01 + orientation) - sin(orientation));
+      double Yw = Ypos - velocity/ omega*(cos(omega * 0.01 + orientation) - cos(orientation));
+      if(!isnan(Xw)){
+        Xpos = Xw;
+      }
+      if(!isnan(Yw)){
+        Ypos = Yw;
+      }
+      // calculating new position and setting new position with check if the value is nan(not a number)
+      orientation = omega * 0.01;
+      // calculating new orientation
+      // Xpos = Xw;
+      // Ypos = Yw;
+      // Serial.print("velocityR: ");
+      // Serial.println(velocityRight);
+      // Serial.print("velocityL: ");
+      // Serial.println(velocityLeft);
+      // Serial.print("pulseCountR: ");
+      // Serial.println(pulseCountRight);
+      // Serial.print("pulseCountL: ");
+      // Serial.println(pulseCountLeft);
+      // Serial.print("velocity: ");
+      // Serial.println(velocity);
+      // Serial.print("radius circle platform: ");
+      // Serial.println(R);
+      // Serial.print("omega: ");
+      // Serial.println(omega);
+      // Serial.print("location x: ");
+      // Serial.println(Xpos);
+      // Serial.print("location y: ");
+      // Serial.println(Ypos);
+      // Serial.print("location xw: ");
+      // Serial.println(Xw);
+      // Serial.print("location yw: ");
+      // Serial.println(Yw);
+      Serial.println("-------------------");
 }
 
 void calculatePID(){
