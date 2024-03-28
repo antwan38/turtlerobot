@@ -1,6 +1,9 @@
 #include "ros.h"
 #include "geometry_msgs/Twist.h"
 #include <PID_v1.h>
+#include <ros/time.h>
+#include <tf/tf.h>
+#include <tf/transform_broadcaster.h>
 
 #define LeftM1 5
 #define LeftM2 6
@@ -16,8 +19,15 @@
 double DistancePerPulse = 0.000418879;
 double LengthBetweenWheels = 0.25;
 
-float x;
-float z;
+double xRobot;
+double yRobot;
+double theta;
+
+double demandLiniarX;
+double demandAngularZ;
+
+char base_link[] = "/base_link";
+char odom[] = "/odom";
 
 // double Xpos = 0;
 // double Ypos = 0;
@@ -42,12 +52,14 @@ float demandRight = 2;
 ros::NodeHandle nh;
 
 void velCallback( const geometry_msgs::Twist& vel){
-  x = vel.linear.x;
-  z = vel.angular.z;
+  demandLiniarX = vel.linear.x;
+  demandAngularZ = vel.angular.z;
 }
 
+geometry_msgs::TransformStamped t;
+tf::TransformBroadcaster broadcaster;
+
 ros::Subscriber<geometry_msgs::Twist> sub("cmd_vel", velCallback);
-//ros::Publisher<geometry_msgs::Twist> pub("cmd_vel", velCallfoward);
 
 volatile int encoderLeftPos = 0;
 volatile int encoderLeftPosPrev = 0;
@@ -93,6 +105,7 @@ void setup()
 
   nh.initNode();
   nh.subscribe(sub);
+  broadcaster.init(nh);
   Serial.begin(115200);
 }
  
@@ -104,6 +117,7 @@ void loop()
     calculatePID();
     calculateRobotVel();
     calculateRobotAngVel();
+    calculateOdom();
     drive();
 
     Serial.print(velocityLeft);
@@ -152,6 +166,26 @@ void calculateRobotVel(){
 
 void calculateRobotAngVel(){
   robotAngVel = (velocityRight - velocityLeft) / LengthBetweenWheels;
+}
+
+void calculateOdom(){
+
+  xRobot += cos(theta)*robotVel*0.1;
+  yRobot += sin(theta)*robotVel*0.1;
+  theta += robotAngVel*0.1;
+  if(theta > 3.14)
+    theta=-3.14;
+
+  t.header.frame_id = odom;
+  t.child_frame_id = base_link;
+  
+  t.transform.translation.x = xRobot;
+  t.transform.translation.y = yRobot;
+  
+  t.transform.rotation = tf::createQuaternionFromYaw(theta);
+  t.header.stamp = nh.now();
+  
+  broadcaster.sendTransform(t);
 }
 
 
