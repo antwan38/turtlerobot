@@ -1,9 +1,4 @@
-#include "ros.h"
-#include "geometry_msgs/Twist.h"
 #include <PID_v1.h>
-#include <ros/time.h>
-#include <tf/tf.h>
-#include <tf/transform_broadcaster.h>
 
 #define LeftM1 5
 #define LeftM2 6
@@ -47,19 +42,17 @@ double SetpointRight, InputRight, OutputRight;
 PID PIDRight(&InputRight, &OutputRight, &SetpointRight, PkRight, IkRight, DkRight, DIRECT);
 
 float demandLeft = 2;
-float demandRight = 2;
+float demandRight = -2;
 
-ros::NodeHandle nh;
+// void velCallback( const geometry_msgs::Twist& vel){
+//   demandLiniarX = vel.linear.x;
+//   demandAngularZ = vel.angular.z;
+// }
 
-void velCallback( const geometry_msgs::Twist& vel){
-  demandLiniarX = vel.linear.x;
-  demandAngularZ = vel.angular.z;
-}
+// geometry_msgs::TransformStamped t;
+// tf::TransformBroadcaster broadcaster;
 
-geometry_msgs::TransformStamped t;
-tf::TransformBroadcaster broadcaster;
-
-ros::Subscriber<geometry_msgs::Twist> sub("cmd_vel", velCallback);
+// ros::Subscriber<geometry_msgs::Twist> sub("cmd_vel", velCallback);
 
 volatile int encoderLeftPos = 0;
 volatile int encoderLeftPosPrev = 0;
@@ -103,9 +96,9 @@ void setup()
   PIDRight.SetOutputLimits(-240, 240);
   PIDRight.SetSampleTime(10);
 
-  nh.initNode();
-  nh.subscribe(sub);
-  broadcaster.init(nh);
+  // nh.initNode();
+  // nh.subscribe(sub);
+  // broadcaster.init(nh);
   Serial.begin(115200);
 }
  
@@ -130,12 +123,12 @@ void loop()
     Serial.println("-------------------");
     
   }
-  if (current >= 20000){
-    demandLeft = 0;
-    demandRight = 0;
+  if (current >= 10000){
+    demandLeft = -2;
+    demandRight = 2;
   }
 
-  nh.spinOnce();
+  // nh.spinOnce();
 }
 
 void calculateWheelVel(){
@@ -170,22 +163,22 @@ void calculateRobotAngVel(){
 
 void calculateOdom(){
 
-  xRobot += cos(theta)*robotVel*0.1;
-  yRobot += sin(theta)*robotVel*0.1;
+  xRobot += cos(theta)*robotVel*0.01;
+  yRobot += sin(theta)*robotVel*0.01;
   theta += robotAngVel*0.1;
   if(theta > 3.14)
     theta=-3.14;
 
-  t.header.frame_id = odom;
-  t.child_frame_id = base_link;
+  // t.header.frame_id = odom;
+  // t.child_frame_id = base_link;
   
-  t.transform.translation.x = xRobot;
-  t.transform.translation.y = yRobot;
+  // t.transform.translation.x = xRobot;
+  // t.transform.translation.y = yRobot;
   
-  t.transform.rotation = tf::createQuaternionFromYaw(theta);
-  t.header.stamp = nh.now();
+  // t.transform.rotation = tf::createQuaternionFromYaw(theta);
+  // t.header.stamp = nh.now();
   
-  broadcaster.sendTransform(t);
+  // broadcaster.sendTransform(t);
 }
 
 
