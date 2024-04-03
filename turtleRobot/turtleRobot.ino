@@ -24,9 +24,6 @@ double demandAngularZ;
 char base_link[] = "/base_link";
 char odom[] = "/odom";
 
-// double Xpos = 0;
-// double Ypos = 0;
-
 double PkLeft = 30;
 double IkLeft = 10;
 double DkLeft = 0.01;
@@ -43,16 +40,6 @@ PID PIDRight(&InputRight, &OutputRight, &SetpointRight, PkRight, IkRight, DkRigh
 
 float demandLeft = 2;
 float demandRight = 2;
-
-// void velCallback( const geometry_msgs::Twist& vel){
-//   demandLiniarX = vel.linear.x;
-//   demandAngularZ = vel.angular.z;
-// }
-
-// geometry_msgs::TransformStamped t;
-// tf::TransformBroadcaster broadcaster;
-
-// ros::Subscriber<geometry_msgs::Twist> sub("cmd_vel", velCallback);
 
 volatile int encoderLeftPos = 0;
 volatile int encoderLeftPosPrev = 0;
@@ -97,9 +84,6 @@ void setup()
   PIDRight.SetOutputLimits(-240, 240);
   PIDRight.SetSampleTime(10);
 
-  // nh.initNode();
-  // nh.subscribe(sub);
-  // broadcaster.init(nh);
   Serial.begin(115200);
 }
  
@@ -112,53 +96,44 @@ void loop()
     calculateRobotVel();
     calculateRobotAngVel();
     calculateOdom();
-    drive();
-
-    
+    //drive();
 
     if (current - prevv >= 500){
-      // Serial.print("leftvel: ");
-      // Serial.println(velocityLeft);
-      // Serial.print("rightvel: ");
-      // Serial.println(velocityRight);
-      // Serial.print("angular: ");
-      // Serial.println(robotAngVel);
-      // Serial.print("X: ");
-      // Serial.println(xRobot);
-      // Serial.print("Y: ");
-      // Serial.println(yRobot);
-      // Serial.print("Theta: ");
-      // Serial.println(theta);
-      // Serial.println("-------------------");
+      Serial.print("X: ");
+    Serial.println(xRobot);
+    Serial.print("Y: ");
+    Serial.println(yRobot);
+    Serial.print("Theta: ");
+    Serial.println(theta);
+    Serial.println("-------------------");
+
       prevv = current;
     }
-    Serial.print(velocityLeft);
-      Serial.print(velocityRight);
-      Serial.print(robotAngVel);
-      Serial.print(xRobot);
-      Serial.print(yRobot);
-      Serial.print(theta);
     
+
     
   }
   if (current >= 5000){
-    demandLeft = 0;
-    demandRight = 0;
+    demandLeft = 2;
+    demandRight = 2;
   }
+}
 
-  // nh.spinOnce();
+void velCallback(int x, int z){
+  demandLiniarX = x;
+  demandAngularZ = z;
 }
 
 void calculateWheelVel(){
-    pulseCountLeft = encoderLeftPos - encoderLeftPosPrev;
-    velocityLeft = pulseCountLeft * DistancePerPulse;
-    velocityLeft = velocityLeft * 100;
-    encoderLeftPosPrev = encoderLeftPos;
+  pulseCountLeft = encoderLeftPos - encoderLeftPosPrev;
+  velocityLeft = pulseCountLeft * DistancePerPulse;
+  velocityLeft = velocityLeft * 100;
+  encoderLeftPosPrev = encoderLeftPos;
     
-    pulseCountRight = encoderRightPos - encoderRightPosPrev;
-    velocityRight = pulseCountRight * DistancePerPulse;
-    velocityRight = velocityRight * 100;
-    encoderRightPosPrev = encoderRightPos;
+  pulseCountRight = encoderRightPos - encoderRightPosPrev;
+  velocityRight = pulseCountRight * DistancePerPulse;
+  velocityRight = velocityRight * 100;
+  encoderRightPosPrev = encoderRightPos;
 }
 
 void calculatePID(){
@@ -193,7 +168,10 @@ void calculateOdom(){
   theta += robotAngVel*0.01;
   
   if(theta > 3.14)
-    theta=-3.14;
+    theta =-3.14 + (theta - 3.14);
+
+  if(theta < -3.14)
+    theta = 3.14 + (theta + 3.14);
 
   // t.header.frame_id = odom;
   // t.child_frame_id = base_link;
@@ -202,7 +180,6 @@ void calculateOdom(){
   // t.transform.translation.y = yRobot;
   
   // t.transform.rotation = tf::createQuaternionFromYaw(theta);
-  // t.header.stamp = nh.now();
   
   // broadcaster.sendTransform(t);
 }
