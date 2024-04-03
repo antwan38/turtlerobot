@@ -42,7 +42,7 @@ double SetpointRight, InputRight, OutputRight;
 PID PIDRight(&InputRight, &OutputRight, &SetpointRight, PkRight, IkRight, DkRight, DIRECT);
 
 float demandLeft = 2;
-float demandRight = -2;
+float demandRight = 2;
 
 // void velCallback( const geometry_msgs::Twist& vel){
 //   demandLiniarX = vel.linear.x;
@@ -69,6 +69,7 @@ double robotAngVel;
 
 unsigned long current = 0;
 unsigned long prev = 0;
+unsigned long prevv = 0;
 
 void setup()
 {
@@ -113,19 +114,36 @@ void loop()
     calculateOdom();
     drive();
 
+    
+
+    if (current - prevv >= 500){
+      // Serial.print("leftvel: ");
+      // Serial.println(velocityLeft);
+      // Serial.print("rightvel: ");
+      // Serial.println(velocityRight);
+      // Serial.print("angular: ");
+      // Serial.println(robotAngVel);
+      // Serial.print("X: ");
+      // Serial.println(xRobot);
+      // Serial.print("Y: ");
+      // Serial.println(yRobot);
+      // Serial.print("Theta: ");
+      // Serial.println(theta);
+      // Serial.println("-------------------");
+      prevv = current;
+    }
     Serial.print(velocityLeft);
-    Serial.print(" :: ");
-    Serial.println(velocityRight);
-    Serial.print("robotAngVel: ");
-    Serial.println(robotAngVel);
-    Serial.print("robotvel: ");
-    Serial.println(robotVel);
-    Serial.println("-------------------");
+      Serial.print(velocityRight);
+      Serial.print(robotAngVel);
+      Serial.print(xRobot);
+      Serial.print(yRobot);
+      Serial.print(theta);
+    
     
   }
-  if (current >= 10000){
-    demandLeft = -2;
-    demandRight = 2;
+  if (current >= 5000){
+    demandLeft = 0;
+    demandRight = 0;
   }
 
   // nh.spinOnce();
@@ -163,9 +181,17 @@ void calculateRobotAngVel(){
 
 void calculateOdom(){
 
-  xRobot += cos(theta)*robotVel*0.01;
-  yRobot += sin(theta)*robotVel*0.01;
-  theta += robotAngVel*0.1;
+  if (robotAngVel != 0){
+    xRobot += robotVel / robotAngVel * (sin(robotAngVel * 0.01 + theta) - sin(theta));
+    yRobot += (-1 * robotVel) / robotAngVel * (cos(robotAngVel * 0.01 + theta) - cos(theta));
+  }
+  else{
+    xRobot += robotVel * cos(theta) * 0.01;
+    yRobot += robotVel * sin(theta) * 0.01;
+  }
+  
+  theta += robotAngVel*0.01;
+  
   if(theta > 3.14)
     theta=-3.14;
 
