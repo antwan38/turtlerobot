@@ -99,24 +99,17 @@ void loop()
     //drive();
 
     if (current - prevv >= 500){
-      // Serial.print("X: ");
-      // Serial.println(xRobot);
-      // Serial.print("Y: ");
-      // Serial.println(yRobot);
-      // Serial.print("Theta: ");
-      // Serial.println(theta);
-      Serial.print("[")
-      Serial.print(xRobot)
-      Serial.print(",")
-      Serial.print(yRobot)
-      Serial.print(",")
-      Serial.print(theta)
-      Serial.println("]")
-      Serial.println("-------------------");
+      
 
       prevv = current;
     }
-    
+    Serial.print("[");
+      Serial.print(xRobot);
+      Serial.print(",");
+      Serial.print(yRobot);
+      Serial.print(",");
+      Serial.print(theta);
+      Serial.println("]");
 
     
   }
