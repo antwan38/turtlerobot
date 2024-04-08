@@ -141,11 +141,11 @@ void loop()
       // Serial.println("----------------");
       piCalcLeft = piLiniar - ((piAngular * LengthBetweenWheels) /2);
       piCalcRight = piLiniar + ((piAngular * LengthBetweenWheels) /2);
-      Serial.print("left: ");
-      Serial.println(piCalcLeft);
-      Serial.print("right: ");
-      Serial.println(piCalcRight);
-      Serial.println("----------------");
+      // Serial.print("left: ");
+      // Serial.println(piCalcLeft);
+      // Serial.print("right: ");
+      // Serial.println(piCalcRight);
+      // Serial.println("----------------");
     }
     
     
