@@ -111,6 +111,8 @@ void loop()
       Serial.print(",");
       Serial.print(robotAngVel);
       Serial.println("]");
+
+      prevv = current;
     }
     // String n = "1.0,2.0";
     if(Serial.available() > 0){
