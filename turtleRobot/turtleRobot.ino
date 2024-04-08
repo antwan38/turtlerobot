@@ -111,25 +111,6 @@ void loop()
       Serial.print(",");
       Serial.print(robotAngVel);
       Serial.println("]");
-      String n = "1.0,2.0";
-    // if(Serial.available() > 0){
-      
-      // String result = Serial.readString();
-      String result = n;
-      const int length = result.length(); 
-  
-      // declaring character array (+1 for null terminator) 
-      char* char_array = result.c_str();
-      int commaplaced = 0;
-      for(int i = 0; i < result.length();i++)
-      {
-        if(strcmp(char_array[i], ',') == 0)
-        {
-           commaplaced = i;
-        }
-      }
-
-      prevv = current;
     }
     // String n = "1.0,2.0";
     if(Serial.available() > 0){
