@@ -38,8 +38,8 @@ double DkRight = 0.01;
 double SetpointRight, InputRight, OutputRight;
 PID PIDRight(&InputRight, &OutputRight, &SetpointRight, PkRight, IkRight, DkRight, DIRECT);
 
-float demandLeft = 2;
-float demandRight = 2;
+double demandLeft = 0;
+double demandRight = 0;
 
 volatile int encoderLeftPos = 0;
 volatile int encoderLeftPosPrev = 0;
@@ -57,6 +57,7 @@ double robotAngVel;
 unsigned long current = 0;
 unsigned long prev = 0;
 unsigned long prevv = 0;
+
 
 void setup()
 {
@@ -96,14 +97,10 @@ void loop()
     calculateRobotVel();
     calculateRobotAngVel();
     calculateOdom();
-    //drive();
+    drive();
 
-    if (current - prevv >= 500){
-      
-
-      prevv = current;
-    }
-    Serial.print("[");
+    if (current - prevv >= 100){
+      Serial.print("[");
       Serial.print(xRobot);
       Serial.print(",");
       Serial.print(yRobot);
@@ -111,12 +108,53 @@ void loop()
       Serial.print(theta);
       Serial.println("]");
 
+
+      prevv = current;
+    }
+    String n = "1.0,2.0";
+    // if(Serial.available() > 0){
+      
+      // String result = Serial.readString();
+      String result = n;
+      const int length = result.length(); 
+  
+      // declaring character array (+1 for null terminator) 
+      char* char_array = result.c_str();
+      int commaplaced = 0;
+      for(int i = 0; i < result.length();i++)
+      {
+        if(strcmp(char_array[i], ',') == 0)
+        {
+           commaplaced = i;
+        }
+      }
+      
+      demandLiniarX = result.substring(0,(commaplaced-1)).toDouble();
+      demandAngularZ = result.substring((commaplaced+1),(result.length()-1)).toDouble();
+      // Serial.print("X: ");
+      // Serial.println(demandLiniarX);
+      // Serial.print("Z: ");
+      // Serial.println(demandAngularZ);
+      // Serial.print("left: ");
+      // Serial.println((float)demandAngularZ*((demandLiniarX/demandAngularZ)-(LengthBetweenWheels/2)));
+      // Serial.print("right: ");
+      // Serial.println((float)demandAngularZ*((demandLiniarX/demandAngularZ)+(LengthBetweenWheels/2)));
+      // Serial.println("----------------");
+      demandLeft = (double)(demandAngularZ*((demandLiniarX/demandAngularZ)-(LengthBetweenWheels/2)));
+      demandRight= (double)(demandAngularZ*((demandLiniarX/demandAngularZ)+(LengthBetweenWheels/2)));
+      // Serial.print("left: ");
+      // Serial.println(demandLeft);
+      // Serial.print("right: ");
+      // Serial.println(demandRight);
+      // Serial.println("----------------");
+    // }
+    
     
   }
-  if (current >= 5000){
-    demandLeft = 2;
-    demandRight = 2;
-  }
+  // if (current >= 5000){
+  //   demandLeft = 2;
+  //   demandRight = 2;
+  // }
 }
 
 void velCallback(int x, int z){
