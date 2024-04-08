@@ -18,8 +18,8 @@ double xRobot;
 double yRobot;
 double theta;
 
-double demandLiniarX;
-double demandAngularZ;
+double piLiniar;
+double piAngular;
 
 char base_link[] = "/base_link";
 char odom[] = "/odom";
@@ -38,8 +38,8 @@ double DkRight = 0.01;
 double SetpointRight, InputRight, OutputRight;
 PID PIDRight(&InputRight, &OutputRight, &SetpointRight, PkRight, IkRight, DkRight, DIRECT);
 
-double demandLeft = 0;
-double demandRight = 0;
+double piCalcLeft = 0;
+double piCalcRight = 0;
 
 volatile int encoderLeftPos = 0;
 volatile int encoderLeftPosPrev = 0;
@@ -107,11 +107,7 @@ void loop()
       Serial.print(",");
       Serial.print(theta);
       Serial.println("]");
-
-
-      prevv = current;
-    }
-    String n = "1.0,2.0";
+      String n = "1.0,2.0";
     // if(Serial.available() > 0){
       
       // String result = Serial.readString();
@@ -128,9 +124,29 @@ void loop()
            commaplaced = i;
         }
       }
+
+      prevv = current;
+    }
+    String n = "1.0,2.0";
+    //if(Serial.available() > 0){
       
-      demandLiniarX = result.substring(0,(commaplaced-1)).toDouble();
-      demandAngularZ = result.substring((commaplaced+1),(result.length()-1)).toDouble();
+      // String result = Serial.readString();
+      String result = n;
+      const int length = result.length(); 
+  
+      // declaring character array (+1 for null terminator) 
+      char* char_array = result.c_str();
+      int commaplaced = 0;
+      for(int i = 0; i < result.length();i++)
+      {
+        if(strcmp(char_array[i], ',') == 0)
+        {
+           commaplaced = i;
+        }
+      }
+      
+      piLiniar = result.substring(0,(commaplaced-1)).toDouble();
+      piAngular = result.substring((commaplaced+1),(result.length()-1)).toDouble();
       // Serial.print("X: ");
       // Serial.println(demandLiniarX);
       // Serial.print("Z: ");
@@ -140,13 +156,13 @@ void loop()
       // Serial.print("right: ");
       // Serial.println((float)demandAngularZ*((demandLiniarX/demandAngularZ)+(LengthBetweenWheels/2)));
       // Serial.println("----------------");
-      demandLeft = (double)(demandAngularZ*((demandLiniarX/demandAngularZ)-(LengthBetweenWheels/2)));
-      demandRight= (double)(demandAngularZ*((demandLiniarX/demandAngularZ)+(LengthBetweenWheels/2)));
-      // Serial.print("left: ");
-      // Serial.println(demandLeft);
-      // Serial.print("right: ");
-      // Serial.println(demandRight);
-      // Serial.println("----------------");
+      piCalcLeft = piLiniar - ((piAngular * LengthBetweenWheels) /2);
+      piCalcRight = piLiniar + ((piAngular * LengthBetweenWheels) /2);
+      Serial.print("left: ");
+      Serial.println(piCalcLeft);
+      Serial.print("right: ");
+      Serial.println(piCalcRight);
+      Serial.println("----------------");
     // }
     
     
@@ -158,8 +174,8 @@ void loop()
 }
 
 void velCallback(int x, int z){
-  demandLiniarX = x;
-  demandAngularZ = z;
+  piLiniar = x;
+  piAngular = z;
 }
 
 void calculateWheelVel(){
@@ -175,11 +191,11 @@ void calculateWheelVel(){
 }
 
 void calculatePID(){
-    SetpointLeft = demandLeft;
+    SetpointLeft = piCalcLeft;
     InputLeft = velocityLeft;
     PIDLeft.Compute();
 
-    SetpointRight = demandRight;
+    SetpointRight = piCalcRight;
     InputRight = velocityRight;
     PIDRight.Compute();
 }
@@ -224,7 +240,7 @@ void calculateOdom(){
 
 
 void drive(){
-  if(demandLeft == 0 && velocityLeft == 0){
+  if(piCalcLeft == 0 && velocityLeft == 0){
       digitalWrite(LeftM1, LOW);
       digitalWrite(LeftM2, LOW);
       analogWrite(LeftPwm, 0);
@@ -246,7 +262,7 @@ void drive(){
       
     }
   }
-    if(demandRight == 0 && velocityRight == 0){
+    if(piCalcRight == 0 && velocityRight == 0){
       digitalWrite(RightM1, LOW);
       digitalWrite(RightM2, LOW);
       analogWrite(RightPwm, 0);
