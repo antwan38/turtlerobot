@@ -107,9 +107,9 @@ void loop()
       Serial.print(",");
       Serial.print(theta);
       Serial.print(",");
-      Serial.print(robotVel)
-      Serial.print(",")
-      Serial.print(robotAngVel)
+      Serial.print(robotVel);
+      Serial.print(",");
+      Serial.print(robotAngVel);
       Serial.println("]");
       String n = "1.0,2.0";
     // if(Serial.available() > 0){
