@@ -138,18 +138,14 @@ void loop()
       // Serial.println(demandLiniarX);
       // Serial.print("Z: ");
       // Serial.println(demandAngularZ);
-      // Serial.print("left: ");
-      // Serial.println((float)demandAngularZ*((demandLiniarX/demandAngularZ)-(LengthBetweenWheels/2)));
-      // Serial.print("right: ");
-      // Serial.println((float)demandAngularZ*((demandLiniarX/demandAngularZ)+(LengthBetweenWheels/2)));
       // Serial.println("----------------");
       piCalcLeft = piLiniar - ((piAngular * LengthBetweenWheels) /2);
       piCalcRight = piLiniar + ((piAngular * LengthBetweenWheels) /2);
-      // Serial.print("left: ");
-      // Serial.println(piCalcLeft);
-      // Serial.print("right: ");
-      // Serial.println(piCalcRight);
-      // Serial.println("----------------");
+      Serial.print("left: ");
+      Serial.println(piCalcLeft);
+      Serial.print("right: ");
+      Serial.println(piCalcRight);
+      Serial.println("----------------");
     }
     
     
@@ -208,11 +204,11 @@ void calculateOdom(){
   
   theta += robotAngVel*0.01;
   
-  if(theta > 3.14)
-    theta =-3.14 + (theta - 3.14);
+  if(theta >  PI)
+    theta = (-1 * PI) + (theta +(-1* PI));
 
-  if(theta < -3.14)
-    theta = 3.14 + (theta + 3.14);
+  if(theta < (-1 * PI))
+    theta = PI + (theta +  PI);
 
   // t.header.frame_id = odom;
   // t.child_frame_id = base_link;
