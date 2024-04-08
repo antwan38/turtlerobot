@@ -106,6 +106,10 @@ void loop()
       Serial.print(yRobot);
       Serial.print(",");
       Serial.print(theta);
+      Serial.print(",");
+      Serial.print(robotVel)
+      Serial.print(",")
+      Serial.print(robotAngVel)
       Serial.println("]");
       String n = "1.0,2.0";
     // if(Serial.available() > 0){
@@ -127,11 +131,11 @@ void loop()
 
       prevv = current;
     }
-    String n = "1.0,2.0";
-    //if(Serial.available() > 0){
+    // String n = "1.0,2.0";
+    if(Serial.available() > 0){
       
-      // String result = Serial.readString();
-      String result = n;
+      String result = Serial.readString();
+      // String result = n;
       const int length = result.length(); 
   
       // declaring character array (+1 for null terminator) 
@@ -158,12 +162,12 @@ void loop()
       // Serial.println("----------------");
       piCalcLeft = piLiniar - ((piAngular * LengthBetweenWheels) /2);
       piCalcRight = piLiniar + ((piAngular * LengthBetweenWheels) /2);
-      Serial.print("left: ");
-      Serial.println(piCalcLeft);
-      Serial.print("right: ");
-      Serial.println(piCalcRight);
-      Serial.println("----------------");
-    // }
+      // Serial.print("left: ");
+      // Serial.println(piCalcLeft);
+      // Serial.print("right: ");
+      // Serial.println(piCalcRight);
+      // Serial.println("----------------");
+    }
     
     
   }
