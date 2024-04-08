@@ -56,11 +56,10 @@ double robotAngVel;
 
 unsigned long current = 0;
 unsigned long prev = 0;
-unsigned long prevv = 0;
+unsigned long prevMessage = 0;
 
 
-void setup()
-{
+void setup() {
   pinMode(LeftM1, OUTPUT);
   pinMode(LeftM2, OUTPUT);
   pinMode(RightM1, OUTPUT);
@@ -87,19 +86,19 @@ void setup()
 
   Serial.begin(115200);
 }
- 
-void loop()
-{
+
+void loop() {
   current = millis();
-  if (current - prev >= 10){
+  if (current - prev >= 10) {
     calculateWheelVel();
     calculatePID();
     calculateRobotVel();
     calculateRobotAngVel();
     calculateOdom();
+    readPiSerial();
     drive();
 
-    if (current - prevv >= 100){
+    if (current - prevMessage >= 100) {
       Serial.print("[");
       Serial.print(xRobot);
       Serial.print(",");
@@ -112,234 +111,186 @@ void loop()
       Serial.print(robotAngVel);
       Serial.println("]");
 
-      prevv = current;
+      prevMessage = current;
     }
-    // String n = "1.0,2.0";
-    if(Serial.available() > 0){
-      
-      String result = Serial.readString();
-      // String result = n;
-      const int length = result.length(); 
-  
-      // declaring character array (+1 for null terminator) 
-      char* char_array = result.c_str();
-      int commaplaced = 0;
-      for(int i = 0; i < result.length();i++)
-      {
-        if(strcmp(char_array[i], ',') == 0)
-        {
-           commaplaced = i;
-        }
-      }
-      
-      piLiniar = result.substring(0,(commaplaced-1)).toDouble();
-      piAngular = result.substring((commaplaced+1),(result.length()-1)).toDouble();
-      // Serial.print("X: ");
-      // Serial.println(demandLiniarX);
-      // Serial.print("Z: ");
-      // Serial.println(demandAngularZ);
-      // Serial.println("----------------");
-      piCalcLeft = piLiniar - ((piAngular * LengthBetweenWheels) /2);
-      piCalcRight = piLiniar + ((piAngular * LengthBetweenWheels) /2);
-      // Serial.print("left: ");
-      // Serial.println(piCalcLeft);
-      // Serial.print("right: ");
-      // Serial.println(piCalcRight);
-      // Serial.println("----------------");
-    }
-    
-    
   }
-  // if (current >= 5000){
-  //   demandLeft = 2;
-  //   demandRight = 2;
-  // }
 }
 
-void velCallback(int x, int z){
-  piLiniar = x;
-  piAngular = z;
-}
 
-void calculateWheelVel(){
+void calculateWheelVel() {
   pulseCountLeft = encoderLeftPos - encoderLeftPosPrev;
   velocityLeft = pulseCountLeft * DistancePerPulse;
   velocityLeft = velocityLeft * 100;
   encoderLeftPosPrev = encoderLeftPos;
-    
+
   pulseCountRight = encoderRightPos - encoderRightPosPrev;
   velocityRight = pulseCountRight * DistancePerPulse;
   velocityRight = velocityRight * 100;
   encoderRightPosPrev = encoderRightPos;
 }
 
-void calculatePID(){
-    SetpointLeft = piCalcLeft;
-    InputLeft = velocityLeft;
-    PIDLeft.Compute();
+void readPiSerial() {
+  if (Serial.available() > 0) {
 
-    SetpointRight = piCalcRight;
-    InputRight = velocityRight;
-    PIDRight.Compute();
+    String result = Serial.readString();
+
+    const int length = result.length();
+
+    char* char_array = result.c_str();
+    int commaplaced = 0;
+    for (int i = 0; i < result.length(); i++) {
+      if (strcmp(char_array[i], ',') == 0) {
+        commaplaced = i;
+      }
+    }
+
+    piLiniar = result.substring(0, (commaplaced - 1)).toDouble();
+    piAngular = result.substring((commaplaced + 1), (result.length() - 1)).toDouble();
+
+    piCalcLeft = piLiniar - ((piAngular * LengthBetweenWheels) / 2);
+    piCalcRight = piLiniar + ((piAngular * LengthBetweenWheels) / 2);
+  }
 }
 
-void calculateRobotVel(){
-  robotVel = (velocityRight + velocityLeft) /2;
+void calculatePID() {
+  SetpointLeft = piCalcLeft;
+  InputLeft = velocityLeft;
+  PIDLeft.Compute();
+
+  SetpointRight = piCalcRight;
+  InputRight = velocityRight;
+  PIDRight.Compute();
 }
 
-void calculateRobotAngVel(){
+void calculateRobotVel() {
+  robotVel = (velocityRight + velocityLeft) / 2;
+}
+
+void calculateRobotAngVel() {
   robotAngVel = (velocityRight - velocityLeft) / LengthBetweenWheels;
 }
 
-void calculateOdom(){
+void calculateOdom() {
 
-  if (robotAngVel != 0){
+  if (robotAngVel != 0) {
     xRobot += robotVel / robotAngVel * (sin(robotAngVel * 0.01 + theta) - sin(theta));
     yRobot += (-1 * robotVel) / robotAngVel * (cos(robotAngVel * 0.01 + theta) - cos(theta));
-  }
-  else{
+  } else {
     xRobot += robotVel * cos(theta) * 0.01;
     yRobot += robotVel * sin(theta) * 0.01;
   }
-  
-  theta += robotAngVel*0.01;
-  
-  if(theta >  PI)
-    theta = (-1 * PI) + (theta +(-1* PI));
 
-  if(theta < (-1 * PI))
-    theta = PI + (theta +  PI);
+  theta += robotAngVel * 0.01;
 
-  // t.header.frame_id = odom;
-  // t.child_frame_id = base_link;
-  
-  // t.transform.translation.x = xRobot;
-  // t.transform.translation.y = yRobot;
-  
-  // t.transform.rotation = tf::createQuaternionFromYaw(theta);
-  
-  // broadcaster.sendTransform(t);
+  if (theta > PI)
+    theta = (-1 * PI) + (theta + (-1 * PI));
+
+  if (theta < (-1 * PI))
+    theta = PI + (theta + PI);
 }
 
 
-void drive(){
-  if(piCalcLeft == 0 && velocityLeft == 0){
-      digitalWrite(LeftM1, LOW);
-      digitalWrite(LeftM2, LOW);
-      analogWrite(LeftPwm, 0);
-  }
-  else{
-    if (OutputLeft > 0){
+void drive() {
+  if (piCalcLeft == 0 && velocityLeft == 0) {
+    digitalWrite(LeftM1, LOW);
+    digitalWrite(LeftM2, LOW);
+    analogWrite(LeftPwm, 0);
+  } else {
+    if (OutputLeft > 0) {
       digitalWrite(LeftM1, LOW);
       digitalWrite(LeftM2, HIGH);
       analogWrite(LeftPwm, abs(OutputLeft));
-    }else if (OutputLeft < 0){
+    } else if (OutputLeft < 0) {
       digitalWrite(LeftM1, HIGH);
       digitalWrite(LeftM2, LOW);
       analogWrite(LeftPwm, abs(OutputLeft));
-    }
-    else{
+    } else {
       digitalWrite(LeftM1, LOW);
       digitalWrite(LeftM2, LOW);
       analogWrite(LeftPwm, 0);
-      
     }
   }
-    if(piCalcRight == 0 && velocityRight == 0){
+  if (piCalcRight == 0 && velocityRight == 0) {
+    digitalWrite(RightM1, LOW);
+    digitalWrite(RightM2, LOW);
+    analogWrite(RightPwm, 0);
+  } else {
+    if (OutputRight > 0) {
+      digitalWrite(RightM1, HIGH);
+      digitalWrite(RightM2, LOW);
+      analogWrite(RightPwm, abs(OutputRight));
+    } else if (OutputRight < 0) {
+      digitalWrite(RightM1, LOW);
+      digitalWrite(RightM2, HIGH);
+      analogWrite(RightPwm, abs(OutputRight));
+    } else {
       digitalWrite(RightM1, LOW);
       digitalWrite(RightM2, LOW);
       analogWrite(RightPwm, 0);
     }
-    else{
-      if (OutputRight > 0){
-      digitalWrite(RightM1, HIGH);
-      digitalWrite(RightM2, LOW);
-      analogWrite(RightPwm, abs(OutputRight));
-    }else if (OutputRight < 0){
-      digitalWrite(RightM1, LOW);
-      digitalWrite(RightM2, HIGH);
-      analogWrite(RightPwm, abs(OutputRight));
-    }
-    else{
-      digitalWrite(RightM1, LOW);
-      digitalWrite(RightM2, LOW);
-      analogWrite(RightPwm, 0);      
-    }
-  } 
+  }
 }
 
-void doEncoderLeftA(){
+void doEncoderLeftA() {
   if (digitalRead(EncoderLeftA) == HIGH) {
-    if(digitalRead(EncoderLeftB) == LOW){
-        encoderLeftPos = encoderLeftPos + 1;
-      }
-      else{
-        encoderLeftPos = encoderLeftPos - 1;
-      }
+    if (digitalRead(EncoderLeftB) == LOW) {
+      encoderLeftPos = encoderLeftPos + 1;
+    } else {
+      encoderLeftPos = encoderLeftPos - 1;
     }
-    else{
-      if(digitalRead(EncoderLeftB) == HIGH){
-        encoderLeftPos = encoderLeftPos + 1;
-      }
-      else{
-        encoderLeftPos = encoderLeftPos - 1;
-      }
+  } else {
+    if (digitalRead(EncoderLeftB) == HIGH) {
+      encoderLeftPos = encoderLeftPos + 1;
+    } else {
+      encoderLeftPos = encoderLeftPos - 1;
     }
+  }
 }
 
-void doEncoderLeftB(){
+void doEncoderLeftB() {
   if (digitalRead(EncoderLeftB) == HIGH) {
-    if(digitalRead(EncoderLeftA) == HIGH){
-        encoderLeftPos = encoderLeftPos + 1;
-      }
-      else{
-        encoderLeftPos = encoderLeftPos - 1;
-      }
+    if (digitalRead(EncoderLeftA) == HIGH) {
+      encoderLeftPos = encoderLeftPos + 1;
+    } else {
+      encoderLeftPos = encoderLeftPos - 1;
     }
-    else{
-      if(digitalRead(EncoderLeftA) == LOW){
-        encoderLeftPos = encoderLeftPos + 1;
-      }
-      else{
-        encoderLeftPos = encoderLeftPos - 1;
-      }
+  } else {
+    if (digitalRead(EncoderLeftA) == LOW) {
+      encoderLeftPos = encoderLeftPos + 1;
+    } else {
+      encoderLeftPos = encoderLeftPos - 1;
     }
+  }
 }
 
-void doEncoderRightA(){
+void doEncoderRightA() {
   if (digitalRead(EncoderRightA) == HIGH) {
-    if(digitalRead(EncoderRightB) == LOW){
-        encoderRightPos = encoderRightPos + 1;
-      }
-      else{
-        encoderRightPos = encoderRightPos - 1;
-      }
+    if (digitalRead(EncoderRightB) == LOW) {
+      encoderRightPos = encoderRightPos + 1;
+    } else {
+      encoderRightPos = encoderRightPos - 1;
     }
-    else{
-      if(digitalRead(EncoderRightB) == HIGH){
-        encoderRightPos = encoderRightPos + 1;
-      }
-      else{
-        encoderRightPos = encoderRightPos - 1;
-      }
+  } else {
+    if (digitalRead(EncoderRightB) == HIGH) {
+      encoderRightPos = encoderRightPos + 1;
+    } else {
+      encoderRightPos = encoderRightPos - 1;
     }
+  }
 }
 
-void doEncoderRightB(){
+void doEncoderRightB() {
   if (digitalRead(EncoderRightB) == HIGH) {
-    if(digitalRead(EncoderRightA) == HIGH){
-        encoderRightPos = encoderRightPos + 1;
-      }
-      else{
-        encoderRightPos = encoderRightPos - 1;
-      }
+    if (digitalRead(EncoderRightA) == HIGH) {
+      encoderRightPos = encoderRightPos + 1;
+    } else {
+      encoderRightPos = encoderRightPos - 1;
     }
-    else{
-      if(digitalRead(EncoderRightA) == LOW){
-        encoderRightPos = encoderRightPos + 1;
-      }
-      else{
-        encoderRightPos = encoderRightPos - 1;
-      }
+  } else {
+    if (digitalRead(EncoderRightA) == LOW) {
+      encoderRightPos = encoderRightPos + 1;
+    } else {
+      encoderRightPos = encoderRightPos - 1;
     }
+  }
 }
