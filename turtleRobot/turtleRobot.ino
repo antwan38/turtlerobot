@@ -1,5 +1,4 @@
 #include <PID_v1.h>
-#include <ArduinoJson.h>
 
 #define LeftM1 5
 #define LeftM2 6
@@ -11,8 +10,6 @@
 #define EncoderLeftB 3
 #define EncoderRightA 20
 #define EncoderRightB 21
-
-JsonDocument robotValues;
 
 double DistancePerPulse = 0.000418879;
 double LengthBetweenWheels = 0.25;
@@ -53,6 +50,8 @@ volatile int pulseCountRight;
 
 double velocityLeft;
 double velocityRight;
+
+char buffer[6];
 
 double robotVel;
 double robotAngVel;
@@ -97,26 +96,42 @@ void loop() {
     calculatePID();
     drive();
 
-    
-
-    if (current - prevMessage >= 100) {
-      calculateRobotVel();
-      calculateRobotAngVel();
-      calculateOdom();
-      readPiSerial();
-      robotValues["x"] = xRobot;
-      robotValues["y"] = yRobot;
-      robotValues["theta"] = theta;
-      robotValues["liniarx"] = robotVel;
-      robotValues["angularz"] = robotAngVel;
-  
-      serializeJson(robotValues, Serial);
-      
-      prevMessage = current;
-    }
+    calculateRobotVel();
+    calculateRobotAngVel();
+    calculateOdom();
+    //readPiSerial();
+    sendAllValues();
   }
 }
 
+String floatToString(float value, char* buffer, int i) {
+  // Handle negative numbers separately
+  bool isNegative = false;
+  if (value < 0) {
+    isNegative = true;
+    value = -value; // Convert to positive for formatting
+  }
+
+  // Format the float value into the string buffer
+  int intValue = static_cast<int>(value); // Integer part of the float
+  int decimalValue = static_cast<int>((value - intValue) * 100); // Two decimal digits
+  
+  if (isNegative) {
+    sprintf(buffer, "-%0"to_string(i-1)"d.%02d", intValue, decimalValue);
+  } else {
+    sprintf(buffer, "%0"to_string(i)"d.%02d", intValue, decimalValue);
+  }
+  return buffer;
+}
+
+void sendAllValues(){
+  String output = floatToString(xRobot, buffer, 6);
+  output = output + floatToString(yRobot, buffer, 6);
+  output = output + floatToString(theta, buffer, 6);
+  output = output + floatToString(robotVel, buffer, 6);
+  output = output + floatToString(robotAngVel, buffer, 6);
+  Serial.println(output);
+}
 
 void calculateWheelVel() {
   pulseCountLeft = encoderLeftPos - encoderLeftPosPrev;
@@ -132,7 +147,7 @@ void calculateWheelVel() {
 
 void readPiSerial() {
   if (Serial.available() > 0) {
-    
+
     String result = Serial.readString();
 
     const int length = result.length();
@@ -144,8 +159,6 @@ void readPiSerial() {
         commaplaced = i;
       }
     }
-    // piLiniar = Serial.readStringUntil('\n').toDouble();
-    // piAngular = Serial.readStringUntil('\n').toDouble();
 
     piLiniar = result.substring(0, (commaplaced - 1)).toDouble();
     piAngular = result.substring((commaplaced + 1), (result.length() - 1)).toDouble();
@@ -153,7 +166,6 @@ void readPiSerial() {
     // piAngular = 0.0;
     piCalcLeft = piLiniar - ((piAngular * LengthBetweenWheels) / 2);
     piCalcRight = piLiniar + ((piAngular * LengthBetweenWheels) / 2);
-    
   }
 }
 
