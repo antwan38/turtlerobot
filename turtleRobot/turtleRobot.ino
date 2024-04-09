@@ -1,4 +1,5 @@
 #include <PID_v1.h>
+#include <ArduinoJson.h>
 
 #define LeftM1 5
 #define LeftM2 6
@@ -10,6 +11,8 @@
 #define EncoderLeftB 3
 #define EncoderRightA 20
 #define EncoderRightB 21
+
+JsonDocument robotValues;
 
 double DistancePerPulse = 0.000418879;
 double LengthBetweenWheels = 0.25;
@@ -24,16 +27,16 @@ double piAngular;
 char base_link[] = "/base_link";
 char odom[] = "/odom";
 
-double PkLeft = 30;
-double IkLeft = 10;
-double DkLeft = 0.01;
+double PkLeft = 100;
+double IkLeft = 0;
+double DkLeft = 0.00;
 
 double SetpointLeft, InputLeft, OutputLeft;
 PID PIDLeft(&InputLeft, &OutputLeft, &SetpointLeft, PkLeft, IkLeft, DkLeft, DIRECT);
 
-double PkRight = 30;
-double IkRight = 10;
-double DkRight = 0.01;
+double PkRight = 100;
+double IkRight = 0;
+double DkRight = 0.00;
 
 double SetpointRight, InputRight, OutputRight;
 PID PIDRight(&InputRight, &OutputRight, &SetpointRight, PkRight, IkRight, DkRight, DIRECT);
@@ -89,28 +92,26 @@ void setup() {
 
 void loop() {
   current = millis();
-  if (current - prev >= 10) {
+  if (current - prev >= 100) {
     calculateWheelVel();
     calculatePID();
-    calculateRobotVel();
-    calculateRobotAngVel();
-    calculateOdom();
-    readPiSerial();
     drive();
 
-    if (current - prevMessage >= 100) {
-      Serial.print("[");
-      Serial.print(xRobot);
-      Serial.print(",");
-      Serial.print(yRobot);
-      Serial.print(",");
-      Serial.print(theta);
-      Serial.print(",");
-      Serial.print(robotVel);
-      Serial.print(",");
-      Serial.print(robotAngVel);
-      Serial.println("]");
+    
 
+    if (current - prevMessage >= 100) {
+      calculateRobotVel();
+      calculateRobotAngVel();
+      calculateOdom();
+      readPiSerial();
+      robotValues["x"] = xRobot;
+      robotValues["y"] = yRobot;
+      robotValues["theta"] = theta;
+      robotValues["liniarx"] = robotVel;
+      robotValues["angularz"] = robotAngVel;
+  
+      serializeJson(robotValues, Serial);
+      
       prevMessage = current;
     }
   }
@@ -131,7 +132,7 @@ void calculateWheelVel() {
 
 void readPiSerial() {
   if (Serial.available() > 0) {
-
+    
     String result = Serial.readString();
 
     const int length = result.length();
@@ -143,12 +144,16 @@ void readPiSerial() {
         commaplaced = i;
       }
     }
+    // piLiniar = Serial.readStringUntil('\n').toDouble();
+    // piAngular = Serial.readStringUntil('\n').toDouble();
 
     piLiniar = result.substring(0, (commaplaced - 1)).toDouble();
     piAngular = result.substring((commaplaced + 1), (result.length() - 1)).toDouble();
-
+    // piLiniar = 1.0;
+    // piAngular = 0.0;
     piCalcLeft = piLiniar - ((piAngular * LengthBetweenWheels) / 2);
     piCalcRight = piLiniar + ((piAngular * LengthBetweenWheels) / 2);
+    
   }
 }
 
