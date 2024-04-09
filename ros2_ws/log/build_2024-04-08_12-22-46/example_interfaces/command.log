@@ -1,0 +1,4 @@
+Invoking command in '/home/antwan/ros2_ws/build/example_interfaces': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/antwan/ros2_ws/build/example_interfaces -- -j8 -l8
+Invoked command in '/home/antwan/ros2_ws/build/example_interfaces' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/antwan/ros2_ws/build/example_interfaces -- -j8 -l8
+Invoking command in '/home/antwan/ros2_ws/build/example_interfaces': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/antwan/ros2_ws/build/example_interfaces
+Invoked command in '/home/antwan/ros2_ws/build/example_interfaces' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/antwan/ros2_ws/build/example_interfaces

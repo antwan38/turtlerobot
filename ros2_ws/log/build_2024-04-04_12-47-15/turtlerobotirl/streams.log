@@ -1,0 +1,42 @@
+[0.385s] Invoking command in '/home/antwan/ros2_ws/src/turtlerobotirl': PYTHONPATH=/home/antwan/ros2_ws/build/turtlerobotirl/prefix_override:/home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py egg_info --egg-base ../../build/turtlerobotirl build --build-base /home/antwan/ros2_ws/build/turtlerobotirl/build install --record /home/antwan/ros2_ws/build/turtlerobotirl/install.log --single-version-externally-managed install_data
+[0.527s] running egg_info
+[0.528s] creating ../../build/turtlerobotirl/turtlerobotirl.egg-info
+[0.528s] writing ../../build/turtlerobotirl/turtlerobotirl.egg-info/PKG-INFO
+[0.528s] writing dependency_links to ../../build/turtlerobotirl/turtlerobotirl.egg-info/dependency_links.txt
+[0.528s] writing entry points to ../../build/turtlerobotirl/turtlerobotirl.egg-info/entry_points.txt
+[0.528s] writing requirements to ../../build/turtlerobotirl/turtlerobotirl.egg-info/requires.txt
+[0.528s] writing top-level names to ../../build/turtlerobotirl/turtlerobotirl.egg-info/top_level.txt
+[0.528s] writing manifest file '../../build/turtlerobotirl/turtlerobotirl.egg-info/SOURCES.txt'
+[0.529s] reading manifest file '../../build/turtlerobotirl/turtlerobotirl.egg-info/SOURCES.txt'
+[0.529s] adding license file 'LICENSE'
+[0.530s] writing manifest file '../../build/turtlerobotirl/turtlerobotirl.egg-info/SOURCES.txt'
+[0.530s] running build
+[0.530s] running build_py
+[0.530s] creating /home/antwan/ros2_ws/build/turtlerobotirl/build
+[0.530s] creating /home/antwan/ros2_ws/build/turtlerobotirl/build/lib
+[0.530s] creating /home/antwan/ros2_ws/build/turtlerobotirl/build/lib/turtlerobotirl
+[0.530s] copying turtlerobotirl/__init__.py -> /home/antwan/ros2_ws/build/turtlerobotirl/build/lib/turtlerobotirl
+[0.530s] copying turtlerobotirl/communication_driver.py -> /home/antwan/ros2_ws/build/turtlerobotirl/build/lib/turtlerobotirl
+[0.530s] copying turtlerobotirl/publisher_member_function.py -> /home/antwan/ros2_ws/build/turtlerobotirl/build/lib/turtlerobotirl
+[0.530s] running install
+[0.530s] running install_lib
+[0.531s] creating /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl
+[0.531s] copying /home/antwan/ros2_ws/build/turtlerobotirl/build/lib/turtlerobotirl/__init__.py -> /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl
+[0.531s] copying /home/antwan/ros2_ws/build/turtlerobotirl/build/lib/turtlerobotirl/communication_driver.py -> /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl
+[0.531s] copying /home/antwan/ros2_ws/build/turtlerobotirl/build/lib/turtlerobotirl/publisher_member_function.py -> /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl
+[0.531s] byte-compiling /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl/__init__.py to __init__.cpython-310.pyc
+[0.531s] byte-compiling /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl/communication_driver.py to communication_driver.cpython-310.pyc
+[0.532s] byte-compiling /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl/publisher_member_function.py to publisher_member_function.cpython-310.pyc
+[0.532s] running install_data
+[0.532s] creating /home/antwan/ros2_ws/install/turtlerobotirl/share/ament_index
+[0.532s] creating /home/antwan/ros2_ws/install/turtlerobotirl/share/ament_index/resource_index
+[0.532s] creating /home/antwan/ros2_ws/install/turtlerobotirl/share/ament_index/resource_index/packages
+[0.532s] copying resource/turtlerobotirl -> /home/antwan/ros2_ws/install/turtlerobotirl/share/ament_index/resource_index/packages
+[0.532s] copying package.xml -> /home/antwan/ros2_ws/install/turtlerobotirl/share/turtlerobotirl
+[0.533s] running install_egg_info
+[0.534s] Copying ../../build/turtlerobotirl/turtlerobotirl.egg-info to /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl-0.0.0-py3.10.egg-info
+[0.534s] running install_scripts
+[0.548s] Installing arduinoTranslator script to /home/antwan/ros2_ws/install/turtlerobotirl/lib/turtlerobotirl
+[0.548s] Installing talker script to /home/antwan/ros2_ws/install/turtlerobotirl/lib/turtlerobotirl
+[0.549s] writing list of installed files to '/home/antwan/ros2_ws/build/turtlerobotirl/install.log'
+[0.563s] Invoked command in '/home/antwan/ros2_ws/src/turtlerobotirl' returned '0': PYTHONPATH=/home/antwan/ros2_ws/build/turtlerobotirl/prefix_override:/home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py egg_info --egg-base ../../build/turtlerobotirl build --build-base /home/antwan/ros2_ws/build/turtlerobotirl/build install --record /home/antwan/ros2_ws/build/turtlerobotirl/install.log --single-version-externally-managed install_data

@@ -1,0 +1,31 @@
+running develop
+Removing /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl.egg-link (link to .)
+running egg_info
+writing ../../build/turtlerobotirl/turtlerobotirl.egg-info/PKG-INFO
+writing dependency_links to ../../build/turtlerobotirl/turtlerobotirl.egg-info/dependency_links.txt
+writing entry points to ../../build/turtlerobotirl/turtlerobotirl.egg-info/entry_points.txt
+writing requirements to ../../build/turtlerobotirl/turtlerobotirl.egg-info/requires.txt
+writing top-level names to ../../build/turtlerobotirl/turtlerobotirl.egg-info/top_level.txt
+reading manifest file '../../build/turtlerobotirl/turtlerobotirl.egg-info/SOURCES.txt'
+adding license file 'LICENSE'
+writing manifest file '../../build/turtlerobotirl/turtlerobotirl.egg-info/SOURCES.txt'
+running build
+running build_py
+running install
+running install_lib
+creating /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl
+copying /home/antwan/ros2_ws/build/turtlerobotirl/build/lib/turtlerobotirl/__init__.py -> /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl
+copying /home/antwan/ros2_ws/build/turtlerobotirl/build/lib/turtlerobotirl/communication_driver.py -> /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl
+copying /home/antwan/ros2_ws/build/turtlerobotirl/build/lib/turtlerobotirl/publisher_member_function.py -> /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl
+byte-compiling /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl/__init__.py to __init__.cpython-310.pyc
+byte-compiling /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl/communication_driver.py to communication_driver.cpython-310.pyc
+byte-compiling /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl/publisher_member_function.py to publisher_member_function.cpython-310.pyc
+running install_data
+copying resource/turtlerobotirl -> /home/antwan/ros2_ws/install/turtlerobotirl/share/ament_index/resource_index/packages
+copying package.xml -> /home/antwan/ros2_ws/install/turtlerobotirl/share/turtlerobotirl
+running install_egg_info
+Copying ../../build/turtlerobotirl/turtlerobotirl.egg-info to /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl-0.0.0-py3.10.egg-info
+running install_scripts
+Installing arduinoTranslator script to /home/antwan/ros2_ws/install/turtlerobotirl/lib/turtlerobotirl
+Installing talker script to /home/antwan/ros2_ws/install/turtlerobotirl/lib/turtlerobotirl
+writing list of installed files to '/home/antwan/ros2_ws/build/turtlerobotirl/install.log'

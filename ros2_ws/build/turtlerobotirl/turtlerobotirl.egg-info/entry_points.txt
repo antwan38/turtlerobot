@@ -1,0 +1,4 @@
+[console_scripts]
+arduinoTranslator = turtlerobotirl.communication_driver:main
+talker = turtlerobotirl.publisher_member_function:main
+

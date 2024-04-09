@@ -1,0 +1,16 @@
+running develop
+running egg_info
+writing turtlerobotirl.egg-info/PKG-INFO
+writing dependency_links to turtlerobotirl.egg-info/dependency_links.txt
+writing entry points to turtlerobotirl.egg-info/entry_points.txt
+writing requirements to turtlerobotirl.egg-info/requires.txt
+writing top-level names to turtlerobotirl.egg-info/top_level.txt
+reading manifest file 'turtlerobotirl.egg-info/SOURCES.txt'
+writing manifest file 'turtlerobotirl.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl.egg-link (link to .)
+Installing arduinoTranslator script to /home/antwan/ros2_ws/install/turtlerobotirl/lib/turtlerobotirl
+Installing talker script to /home/antwan/ros2_ws/install/turtlerobotirl/lib/turtlerobotirl
+
+Installed /home/antwan/ros2_ws/build/turtlerobotirl
+running symlink_data

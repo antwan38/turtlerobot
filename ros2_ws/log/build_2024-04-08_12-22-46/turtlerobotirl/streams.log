@@ -1,0 +1,20 @@
+[0.563s] Invoking command in '/home/antwan/ros2_ws/build/turtlerobotirl': PYTHONPATH=/home/antwan/ros2_ws/build/turtlerobotirl/prefix_override:/home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py develop --editable --build-directory /home/antwan/ros2_ws/build/turtlerobotirl/build --no-deps symlink_data
+[0.745s] running develop
+[0.747s] /usr/lib/python3/dist-packages/setuptools/command/easy_install.py:158: EasyInstallDeprecationWarning: easy_install command is deprecated. Use build and pip and other standards-based tools.
+[0.747s]   warnings.warn(
+[0.853s] running egg_info
+[0.853s] writing turtlerobotirl.egg-info/PKG-INFO
+[0.853s] writing dependency_links to turtlerobotirl.egg-info/dependency_links.txt
+[0.853s] writing entry points to turtlerobotirl.egg-info/entry_points.txt
+[0.853s] writing requirements to turtlerobotirl.egg-info/requires.txt
+[0.854s] writing top-level names to turtlerobotirl.egg-info/top_level.txt
+[0.855s] reading manifest file 'turtlerobotirl.egg-info/SOURCES.txt'
+[0.855s] writing manifest file 'turtlerobotirl.egg-info/SOURCES.txt'
+[0.856s] running build_ext
+[0.856s] Creating /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl.egg-link (link to .)
+[0.857s] Installing arduinoTranslator script to /home/antwan/ros2_ws/install/turtlerobotirl/lib/turtlerobotirl
+[0.857s] Installing talker script to /home/antwan/ros2_ws/install/turtlerobotirl/lib/turtlerobotirl
+[0.857s] 
+[0.857s] Installed /home/antwan/ros2_ws/build/turtlerobotirl
+[0.857s] running symlink_data
+[0.876s] Invoked command in '/home/antwan/ros2_ws/build/turtlerobotirl' returned '0': PYTHONPATH=/home/antwan/ros2_ws/build/turtlerobotirl/prefix_override:/home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py develop --editable --build-directory /home/antwan/ros2_ws/build/turtlerobotirl/build --no-deps symlink_data

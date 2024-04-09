@@ -1,0 +1,22 @@
+[0.410s] Invoking command in '/home/antwan/ros2_ws/build/turtlerobotirl': PYTHONPATH=/home/antwan/ros2_ws/build/turtlerobotirl/prefix_override:/home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py develop --editable --build-directory /home/antwan/ros2_ws/build/turtlerobotirl/build --no-deps symlink_data --force
+[0.583s] running develop
+[0.584s] /usr/lib/python3/dist-packages/setuptools/command/easy_install.py:158: EasyInstallDeprecationWarning: easy_install command is deprecated. Use build and pip and other standards-based tools.
+[0.584s]   warnings.warn(
+[0.751s] running egg_info
+[0.751s] writing turtlerobotirl.egg-info/PKG-INFO
+[0.752s] writing dependency_links to turtlerobotirl.egg-info/dependency_links.txt
+[0.752s] writing entry points to turtlerobotirl.egg-info/entry_points.txt
+[0.752s] writing requirements to turtlerobotirl.egg-info/requires.txt
+[0.752s] writing top-level names to turtlerobotirl.egg-info/top_level.txt
+[0.754s] reading manifest file 'turtlerobotirl.egg-info/SOURCES.txt'
+[0.755s] writing manifest file 'turtlerobotirl.egg-info/SOURCES.txt'
+[0.757s] running build_ext
+[0.757s] Creating /home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages/turtlerobotirl.egg-link (link to .)
+[0.758s] Installing arduinoTranslator script to /home/antwan/ros2_ws/install/turtlerobotirl/lib/turtlerobotirl
+[0.758s] Installing talker script to /home/antwan/ros2_ws/install/turtlerobotirl/lib/turtlerobotirl
+[0.758s] 
+[0.758s] Installed /home/antwan/ros2_ws/build/turtlerobotirl
+[0.759s] running symlink_data
+[0.759s] symbolically linking /home/antwan/ros2_ws/build/turtlerobotirl/resource/turtlerobotirl -> /home/antwan/ros2_ws/install/turtlerobotirl/share/ament_index/resource_index/packages
+[0.759s] symbolically linking /home/antwan/ros2_ws/build/turtlerobotirl/package.xml -> /home/antwan/ros2_ws/install/turtlerobotirl/share/turtlerobotirl
+[0.789s] Invoked command in '/home/antwan/ros2_ws/build/turtlerobotirl' returned '0': PYTHONPATH=/home/antwan/ros2_ws/build/turtlerobotirl/prefix_override:/home/antwan/ros2_ws/install/turtlerobotirl/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py develop --editable --build-directory /home/antwan/ros2_ws/build/turtlerobotirl/build --no-deps symlink_data --force
