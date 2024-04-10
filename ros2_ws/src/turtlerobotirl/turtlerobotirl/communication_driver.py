@@ -43,12 +43,11 @@ class CommunicationrDiver(Node):
 				print("line")
 				print(line)
 
-
-				self.x = data["x"]
-				self.y = 0000
-				self.theta = data["theta"]
-				self.linear = data["liniarx"]
-				self.angular = data["angularz"]
+				self.x = float(line[:6])		
+				self.y = float(line[7:12])		
+				self.theta = float(line[13:17])		
+				self.lineair = float(line[18:22])	
+				self.angular = float(line[23:27])
 
 				print(5)
 			except Exception as e:
