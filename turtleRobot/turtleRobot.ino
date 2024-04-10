@@ -52,6 +52,7 @@ double velocityLeft;
 double velocityRight;
 
 char buffer[6];
+char formatArray[6];
 
 double robotVel;
 double robotAngVel;
@@ -105,31 +106,40 @@ void loop() {
 }
 
 String floatToString(float value, char* buffer, int i) {
-  // Handle negative numbers separately
   bool isNegative = false;
   if (value < 0) {
     isNegative = true;
-    value = -value; // Convert to positive for formatting
+    value = -value; 
   }
 
   // Format the float value into the string buffer
   int intValue = static_cast<int>(value); // Integer part of the float
   int decimalValue = static_cast<int>((value - intValue) * 100); // Two decimal digits
-  
+
   if (isNegative) {
-    sprintf(buffer, "-%0"to_string(i-1)"d.%02d", intValue, decimalValue);
+    if(i == 3){
+      sprintf(buffer, "-%02d.%02d", intValue, decimalValue);
+    }
+    else{
+      sprintf(buffer, "-%01d.%02d", intValue, decimalValue);
+    }
   } else {
-    sprintf(buffer, "%0"to_string(i)"d.%02d", intValue, decimalValue);
+    if(i == 3){
+      sprintf(buffer, "%03d.%02d", intValue, decimalValue);
+    }
+    else{
+      sprintf(buffer, "%02d.%02d", intValue, decimalValue);
+    }
   }
   return buffer;
 }
 
 void sendAllValues(){
-  String output = floatToString(xRobot, buffer, 6);
-  output = output + floatToString(yRobot, buffer, 6);
-  output = output + floatToString(theta, buffer, 6);
-  output = output + floatToString(robotVel, buffer, 6);
-  output = output + floatToString(robotAngVel, buffer, 6);
+  String output = floatToString(xRobot, buffer, 3);
+  output = output + floatToString(yRobot, buffer, 3);
+  output = output + floatToString(theta, buffer, 2);
+  output = output + floatToString(robotVel, buffer, 2);
+  output = output + floatToString(robotAngVel, buffer, 2);
   Serial.println(output);
 }
 
