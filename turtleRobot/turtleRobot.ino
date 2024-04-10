@@ -136,6 +136,7 @@ String floatToString(float value, char* buffer, int i) {
     }
   } else {
     if (i == 3) {
+      
       sprintf(buffer, "%03d.%02d", intValue, decimalValue);
     } else {
       sprintf(buffer, "%02d.%02d", intValue, decimalValue);
