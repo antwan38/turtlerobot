@@ -21,17 +21,14 @@ double theta;
 double piLiniar;
 double piAngular;
 
-char base_link[] = "/base_link";
-char odom[] = "/odom";
-
-double PkLeft = 100;
+double PkLeft = 5;
 double IkLeft = 0;
 double DkLeft = 0.00;
 
 double SetpointLeft, InputLeft, OutputLeft;
 PID PIDLeft(&InputLeft, &OutputLeft, &SetpointLeft, PkLeft, IkLeft, DkLeft, DIRECT);
 
-double PkRight = 100;
+double PkRight = 5;
 double IkRight = 0;
 double DkRight = 0.00;
 
@@ -57,9 +54,8 @@ char formatArray[6];
 double robotVel;
 double robotAngVel;
 
-unsigned long current = 0;
-unsigned long prev = 0;
-unsigned long prevMessage = 0;
+unsigned long current;
+unsigned long prev;
 
 
 void setup() {
@@ -100,8 +96,9 @@ void loop() {
     calculateRobotVel();
     calculateRobotAngVel();
     calculateOdom();
-    //readPiSerial();
+    readPiSerial();
     sendAllValues();
+    prev = current;
   }
 }
 
@@ -109,33 +106,31 @@ String floatToString(float value, char* buffer, int i) {
   bool isNegative = false;
   if (value < 0) {
     isNegative = true;
-    value = -value; 
+    value = -value;
   }
 
-  // Format the float value into the string buffer
-  int intValue = static_cast<int>(value); // Integer part of the float
-  int decimalValue = static_cast<int>((value - intValue) * 100); // Two decimal digits
+  int intValue = static_cast<int>(value);
+  int decimalValue = static_cast<int>((value - intValue) * 100);
 
   if (isNegative) {
-    if(i == 3){
+    if (i == 3) {
       sprintf(buffer, "-%02d.%02d", intValue, decimalValue);
-    }
-    else{
+    } else {
       sprintf(buffer, "-%01d.%02d", intValue, decimalValue);
     }
   } else {
-    if(i == 3){
+    if (i == 3) {
       sprintf(buffer, "%03d.%02d", intValue, decimalValue);
-    }
-    else{
+    } else {
       sprintf(buffer, "%02d.%02d", intValue, decimalValue);
     }
   }
   return buffer;
 }
 
-void sendAllValues(){
-  String output = floatToString(xRobot, buffer, 3);
+void sendAllValues() {
+  String output = "a";
+  output = output + floatToString(xRobot, buffer, 3);
   output = output + floatToString(yRobot, buffer, 3);
   output = output + floatToString(theta, buffer, 2);
   output = output + floatToString(robotVel, buffer, 2);
@@ -157,25 +152,25 @@ void calculateWheelVel() {
 
 void readPiSerial() {
   if (Serial.available() > 0) {
-
     String result = Serial.readString();
+    if (result[0] != "a") {
+      Serial.println(result);
+      const int length = result.length();
 
-    const int length = result.length();
-
-    char* char_array = result.c_str();
-    int commaplaced = 0;
-    for (int i = 0; i < result.length(); i++) {
-      if (strcmp(char_array[i], ',') == 0) {
-        commaplaced = i;
+      char* char_array = result.c_str();
+      int commaplaced = 0;
+      for (int i = 0; i < result.length(); i++) {
+        if (strcmp(char_array[i], ',') == 0) {
+          commaplaced = i;
+        }
       }
-    }
 
-    piLiniar = result.substring(0, (commaplaced - 1)).toDouble();
-    piAngular = result.substring((commaplaced + 1), (result.length() - 1)).toDouble();
-    // piLiniar = 1.0;
-    // piAngular = 0.0;
-    piCalcLeft = piLiniar - ((piAngular * LengthBetweenWheels) / 2);
-    piCalcRight = piLiniar + ((piAngular * LengthBetweenWheels) / 2);
+      piLiniar = result.substring(0, (commaplaced - 1)).toDouble();
+      piAngular = result.substring((commaplaced + 1), (result.length() - 1)).toDouble();
+
+      piCalcLeft = piLiniar - ((piAngular * LengthBetweenWheels) / 2);
+      piCalcRight = piLiniar + ((piAngular * LengthBetweenWheels) / 2);
+    }
   }
 }
 
