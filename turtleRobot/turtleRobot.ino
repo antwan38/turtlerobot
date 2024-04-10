@@ -21,14 +21,14 @@ double theta;
 double piLiniar;
 double piAngular;
 
-double PkLeft = 5;
+double PkLeft = 20;
 double IkLeft = 0;
 double DkLeft = 0.00;
 
 double SetpointLeft, InputLeft, OutputLeft;
 PID PIDLeft(&InputLeft, &OutputLeft, &SetpointLeft, PkLeft, IkLeft, DkLeft, DIRECT);
 
-double PkRight = 5;
+double PkRight = 20;
 double IkRight = 0;
 double DkRight = 0.00;
 
@@ -88,7 +88,7 @@ void setup() {
 
 void loop() {
   current = millis();
-  if (current - prev >= 100) {
+  if (current - prev >= 200) {
     calculateWheelVel();
     calculatePID();
     drive();
@@ -96,7 +96,7 @@ void loop() {
     calculateRobotVel();
     calculateRobotAngVel();
     calculateOdom();
-    readPiSerial();
+    //readPiSerial();
     sendAllValues();
     prev = current;
   }
@@ -135,7 +135,12 @@ void sendAllValues() {
   output = output + floatToString(theta, buffer, 2);
   output = output + floatToString(robotVel, buffer, 2);
   output = output + floatToString(robotAngVel, buffer, 2);
-  Serial.println(output);
+  if(output.length() > 28){
+  }
+  else{
+    Serial.println(output);
+  }
+  
 }
 
 void calculateWheelVel() {
