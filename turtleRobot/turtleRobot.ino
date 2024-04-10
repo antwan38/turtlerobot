@@ -48,14 +48,15 @@ volatile int pulseCountRight;
 double velocityLeft;
 double velocityRight;
 
-char buffer[6];
-char formatArray[6];
-
 double robotVel;
 double robotAngVel;
 
-unsigned long current;
-unsigned long prev;
+unsigned long current = 0;
+unsigned long prev = 0;
+unsigned long prevMessage = 0;
+
+char buffer[6];
+char formatArray[6];
 
 
 void setup() {
@@ -88,17 +89,32 @@ void setup() {
 
 void loop() {
   current = millis();
-  if (current - prev >= 200) {
+  if (current - prev >= 10) {
     calculateWheelVel();
     calculatePID();
-    drive();
-
     calculateRobotVel();
     calculateRobotAngVel();
     calculateOdom();
-    //readPiSerial();
-    sendAllValues();
-    prev = current;
+    readPiSerial();
+    drive();
+
+    if (current - prevMessage >= 300) {
+      Serial.print("[");
+      Serial.print(xRobot);
+      Serial.print(",");
+      Serial.print(yRobot);
+      Serial.print(",");
+      Serial.print(theta);
+      Serial.print(",");
+      Serial.print(robotVel);
+      Serial.print(",");
+      Serial.print(robotAngVel);
+      Serial.println("]");
+
+      //sendAllValues();
+
+      prevMessage = current;
+    }
   }
 }
 
@@ -129,8 +145,7 @@ String floatToString(float value, char* buffer, int i) {
 }
 
 void sendAllValues() {
-  String output = "a";
-  output = output + floatToString(xRobot, buffer, 3);
+  String output = floatToString(xRobot, buffer, 3);
   output = output + floatToString(yRobot, buffer, 3);
   output = output + floatToString(theta, buffer, 2);
   output = output + floatToString(robotVel, buffer, 2);
@@ -157,25 +172,24 @@ void calculateWheelVel() {
 
 void readPiSerial() {
   if (Serial.available() > 0) {
+
     String result = Serial.readString();
-    if (result[0] != "a") {
-      Serial.println(result);
-      const int length = result.length();
 
-      char* char_array = result.c_str();
-      int commaplaced = 0;
-      for (int i = 0; i < result.length(); i++) {
-        if (strcmp(char_array[i], ',') == 0) {
-          commaplaced = i;
-        }
+    const int length = result.length();
+
+    char* char_array = result.c_str();
+    int commaplaced = 0;
+    for (int i = 0; i < result.length(); i++) {
+      if (strcmp(char_array[i], ',') == 0) {
+        commaplaced = i;
       }
-
-      piLiniar = result.substring(0, (commaplaced - 1)).toDouble();
-      piAngular = result.substring((commaplaced + 1), (result.length() - 1)).toDouble();
-
-      piCalcLeft = piLiniar - ((piAngular * LengthBetweenWheels) / 2);
-      piCalcRight = piLiniar + ((piAngular * LengthBetweenWheels) / 2);
     }
+
+    piLiniar = result.substring(0, (commaplaced - 1)).toDouble();
+    piAngular = result.substring((commaplaced + 1), (result.length() - 1)).toDouble();
+
+    piCalcLeft = piLiniar - ((piAngular * LengthBetweenWheels) / 2);
+    piCalcRight = piLiniar + ((piAngular * LengthBetweenWheels) / 2);
   }
 }
 
