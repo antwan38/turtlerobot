@@ -34,14 +34,11 @@ class CommunicationrDiver(Node):
 	def location_callback(self):
 		time.sleep(0.1)
 		self.euler_to_quaternion()
-		print("w")
-		print(ser.in_waiting)
 		if ser.in_waiting > 0:
 			try:
 				self.x, self.y, self.theta, self.lineair, self.angular   = ser.readline().decode('utf-8').split(",")
 				self.x, self.y, self.theta, self.lineair, self.angular = map(float, [self.x, self.y, self.theta, self.lineair, self.angular])
 
-				print(5)
 			except Exception as e:
 				print("Error reading serial data:", e)
 
@@ -66,8 +63,6 @@ class CommunicationrDiver(Node):
 			self.tf_broadcaster.sendTransform(transform_stamped)
 			#self.publisher_.publish(odom_msg)
 		
-			print(line)
-
 	def euler_to_quaternion(self):
 		cy = np.cos(self.theta * 0.5)
 		sy = np.sin(self.theta * 0.5)
@@ -91,8 +86,8 @@ def main(args=None):
 	rclpy.shutdown()
 
 def cmd_vel_callback(msg):
-		output = str(msg.linear.x )+","+ str(msg.angular.z)
-		ser.write(output.encode())
+	output = str(msg.linear.x )+","+ str(msg.angular.z)
+	ser.write(output.encode())
 
 
 if __name__ == '__main__':
