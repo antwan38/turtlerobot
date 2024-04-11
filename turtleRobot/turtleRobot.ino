@@ -11,8 +11,8 @@
 #define EncoderRightA 20
 #define EncoderRightB 21
 
-double DistancePerPulse = 0.000418879;
-double LengthBetweenWheels = 0.25;
+double DistancePerPulse = 0.00040;
+double LengthBetweenWheels = 0.30;
 
 double xRobot;
 double yRobot;
@@ -21,14 +21,15 @@ double theta;
 double piLiniar;
 double piAngular;
 
-double PkLeft = 20;
+
+double PkLeft = 50;
 double IkLeft = 0;
 double DkLeft = 0.00;
 
 double SetpointLeft, InputLeft, OutputLeft;
 PID PIDLeft(&InputLeft, &OutputLeft, &SetpointLeft, PkLeft, IkLeft, DkLeft, DIRECT);
 
-double PkRight = 20;
+double PkRight = 50;
 double IkRight = 0;
 double DkRight = 0.00;
 
@@ -99,18 +100,18 @@ void loop() {
     drive();
 
     if (current - prevMessage >= 300) {
-      Serial.print("[");
-      Serial.print(xRobot);
-      Serial.print(",");
-      Serial.print(yRobot);
-      Serial.print(",");
-      Serial.print(theta);
-      Serial.print(",");
-      Serial.print(robotVel);
-      Serial.print(",");
-      Serial.print(robotAngVel);
-      Serial.println("]");
+      String printData; 
 
+      String SxRobot = String(xRobot);
+      String SyRobot = String(yRobot);
+      String Stheta = String(theta);
+      String Slinear = String(robotVel);
+      String Sangular = String(robotAngVel);
+
+      printData = SxRobot + "," + SyRobot + "," + Stheta + "," + Slinear + "," + Sangular;
+      Serial.println(printData);
+      //Serial.print(xRobot);
+      //Serial.print(xRobot + "," + yRobot + "," + theta + "," + robotVel + "," + robotAngVel);
       //sendAllValues();
 
       prevMessage = current;
