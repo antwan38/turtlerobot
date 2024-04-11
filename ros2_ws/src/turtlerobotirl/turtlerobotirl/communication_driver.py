@@ -38,16 +38,8 @@ class CommunicationrDiver(Node):
 		print(ser.in_waiting)
 		if ser.in_waiting > 0:
 			try:
-				print("start")
-				line = ser.readline().decode('utf-8')
-				print("line")
-				print(line)
-
-				self.x = float(line[:6])		
-				self.y = float(line[7:12])		
-				self.theta = float(line[13:17])		
-				self.lineair = float(line[18:22])	
-				self.angular = float(line[23:27])
+				self.x, self.y, self.theta, self.lineair, self.angular   = ser.readline().decode('utf-8').split(",")
+				self.x, self.y, self.theta, self.lineair, self.angular = map(float, [self.x, self.y, self.theta, self.lineair, self.angular])
 
 				print(5)
 			except Exception as e:
