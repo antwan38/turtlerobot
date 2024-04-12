@@ -25,7 +25,7 @@ class CommunicationrDiver(Node):
 		self.x = 0.0
 		self.y = 0.0
 		time.sleep(3)
-		self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
+
 		ser.reset_input_buffer()
 		timer_period = 0.1  # seconds
 		self.timer = self.create_timer(timer_period, self.location_callback)
@@ -36,32 +36,24 @@ class CommunicationrDiver(Node):
 		self.euler_to_quaternion()
 		if ser.in_waiting > 0:
 			try:
-				self.x, self.y, self.theta, self.lineair, self.angular   = ser.readline().decode('utf-8').split(",")
-				self.x, self.y, self.theta, self.lineair, self.angular = map(float, [self.x, self.y, self.theta, self.lineair, self.angular])
+				self.x, self.y, self.theta, self.linear, self.angular   = ser.readline().decode('utf-8').split(",")
+				self.x, self.y, self.theta, self.linear, self.angular = map(float, [self.x, self.y, self.theta, self.linear, self.angular])
+				print(self.theta)
 
 			except Exception as e:
 				print("Error reading serial data:", e)
 
-			# odom_msg = Odometry()
-			# odom_msg.header.stamp = self.get_clock().now().to_msg()
-			# odom_msg.header.frame_id = 'odom'
-			# odom_msg.child_frame_id = 'base_link'
+			odom_msg = Odometry()
+			odom_msg.header.stamp = self.get_clock().now().to_msg()
+			odom_msg.header.frame_id = 'odom'
+			odom_msg.child_frame_id = 'base_footprint'
 
-			# odom_msg.pose.pose.position = Point(x=self.x, y=self.y, z=0.0)
-			# odom_msg.pose.pose.orientation = Quaternion(x=0.0, y=0.0, z=self.theta, w=1.0)
-			# odom_msg.twist.twist.linear = Vector3(x=self.linear, y=0.0, z=0.0)
-			# odom_msg.twist.twist.angular = Vector3(x=0.0, y=0.0, z=self.angular)
+			odom_msg.pose.pose.position = Point(x=self.x, y=self.y, z=0.0)
+			odom_msg.pose.pose.orientation = self.quaternion
+			odom_msg.twist.twist.linear = Vector3(x=self.linear, y=0.0, z=0.0)
+			odom_msg.twist.twist.angular = Vector3(x=0.0, y=0.0, z=self.angular)
 
-			transform_stamped = TransformStamped()
-			transform_stamped.header.stamp = self.get_clock().now().to_msg()
-			transform_stamped.header.frame_id = "odomtf"
-			transform_stamped.child_frame_id = "base_linktf" 
-			transform_stamped.transform.translation.x = self.x
-			transform_stamped.transform.translation.y = self.y
-			transform_stamped.transform.rotation = self.quaternion
-
-			self.tf_broadcaster.sendTransform(transform_stamped)
-			#self.publisher_.publish(odom_msg)
+			self.publisher_.publish(odom_msg)
 		
 	def euler_to_quaternion(self):
 		cy = np.cos(self.theta * 0.5)
