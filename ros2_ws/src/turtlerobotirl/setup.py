@@ -1,4 +1,6 @@
 from setuptools import find_packages, setup
+import os
+from glob import glob
 
 package_name = 'turtlerobotirl'
 
@@ -7,6 +9,7 @@ setup(
     version='0.0.0',
     packages=find_packages(exclude=['test']),
     data_files=[
+    	(os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', '*launch.[pxy][yma]*'))),
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
@@ -21,7 +24,8 @@ setup(
     entry_points={
         'console_scripts': [
          'talker = turtlerobotirl.publisher_member_function:main',
-         'arduinoTranslator = turtlerobotirl.communication_driver:main'
+         'arduinoTranslator = turtlerobotirl.communication_driver:main',
+         'odomTranslator = turtlerobotirl.odom_translater:main'
         ],
     },
 )
