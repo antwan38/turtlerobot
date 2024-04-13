@@ -14,6 +14,7 @@
 double DistancePerPulse = 0.00040;
 double LengthBetweenWheels = 0.30;
 
+
 double xRobot;
 double yRobot;
 double theta;
@@ -22,15 +23,15 @@ double piLiniar;
 double piAngular;
 
 
-double PkLeft = 50;
-double IkLeft = 0;
+double PkLeft = 0.3;
+double IkLeft = 0.005;
 double DkLeft = 0.00;
 
 double SetpointLeft, InputLeft, OutputLeft;
 PID PIDLeft(&InputLeft, &OutputLeft, &SetpointLeft, PkLeft, IkLeft, DkLeft, DIRECT);
 
-double PkRight = 50;
-double IkRight = 0;
+double PkRight = 0.3;
+double IkRight = 0.005;
 double DkRight = 0.00;
 
 double SetpointRight, InputRight, OutputRight;
@@ -46,6 +47,9 @@ volatile int encoderRightPosPrev = 0;
 volatile int pulseCountLeft;
 volatile int pulseCountRight;
 
+const float wheelCircumference = 0.22;
+const int encoderResolution = 625; 
+
 double velocityLeft;
 double velocityRight;
 
@@ -55,9 +59,6 @@ double robotAngVel;
 unsigned long current = 0;
 unsigned long prev = 0;
 unsigned long prevMessage = 0;
-
-char buffer[6];
-char formatArray[6];
 
 
 void setup() {
@@ -98,8 +99,9 @@ void loop() {
     calculateOdom();
     readPiSerial();
     drive();
-
-    if (current - prevMessage >= 300) {
+    prev = current;
+  }
+  if (current - prevMessage >= 250) {
       String printData; 
 
       String SxRobot = String(xRobot);
@@ -109,64 +111,28 @@ void loop() {
       String Sangular = String(robotAngVel);
 
       printData = SxRobot + "," + SyRobot + "," + Stheta + "," + Slinear + "," + Sangular;
-      Serial.println(printData);
-      //Serial.print(xRobot);
-      //Serial.print(xRobot + "," + yRobot + "," + theta + "," + robotVel + "," + robotAngVel);
-      //sendAllValues();
+      //Serial.println(printData);
+      Serial.print("Input");
+      Serial.println(InputLeft);
+      Serial.print("output");
+      Serial.println(OutputLeft);
+      Serial.print("setpoint");
+      Serial.println(SetpointLeft);
+
 
       prevMessage = current;
     }
-  }
-}
-
-String floatToString(float value, char* buffer, int i) {
-  bool isNegative = false;
-  if (value < 0) {
-    isNegative = true;
-    value = -value;
-  }
-
-  int intValue = static_cast<int>(value);
-  int decimalValue = static_cast<int>((value - intValue) * 100);
-
-  if (isNegative) {
-    if (i == 3) {
-      sprintf(buffer, "-%02d.%02d", intValue, decimalValue);
-    } else {
-      sprintf(buffer, "-%01d.%02d", intValue, decimalValue);
-    }
-  } else {
-    if (i == 3) {
-      
-      sprintf(buffer, "%03d.%02d", intValue, decimalValue);
-    } else {
-      sprintf(buffer, "%02d.%02d", intValue, decimalValue);
-    }
-  }
-  return buffer;
-}
-
-void sendAllValues() {
-  String output = floatToString(xRobot, buffer, 3);
-  output = output + floatToString(yRobot, buffer, 3);
-  output = output + floatToString(theta, buffer, 2);
-  output = output + floatToString(robotVel, buffer, 2);
-  output = output + floatToString(robotAngVel, buffer, 2);
-  if(output.length() > 28){
-  }
-  else{
-    Serial.println(output);
-  }
-  
 }
 
 void calculateWheelVel() {
   pulseCountLeft = encoderLeftPos - encoderLeftPosPrev;
+  InputLeft = pulseCountLeft * 100;
   velocityLeft = pulseCountLeft * DistancePerPulse;
   velocityLeft = velocityLeft * 100;
   encoderLeftPosPrev = encoderLeftPos;
 
   pulseCountRight = encoderRightPos - encoderRightPosPrev;
+  InputRight = pulseCountRight * 100;
   velocityRight = pulseCountRight * DistancePerPulse;
   velocityRight = velocityRight * 100;
   encoderRightPosPrev = encoderRightPos;
@@ -196,12 +162,12 @@ void readPiSerial() {
 }
 
 void calculatePID() {
-  SetpointLeft = piCalcLeft;
-  InputLeft = velocityLeft;
+  SetpointLeft = piCalcLeft * (encoderResolution / wheelCircumference);
+  
   PIDLeft.Compute();
 
-  SetpointRight = piCalcRight;
-  InputRight = velocityRight;
+  SetpointRight = piCalcRight * (encoderResolution / wheelCircumference);
+  
   PIDRight.Compute();
 }
 
